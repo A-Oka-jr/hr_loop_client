@@ -12,6 +12,7 @@ import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import Jobs from "./pages/Jobs.jsx";
 import { useSelector } from "react-redux";
+import SignUp from "./pages/SignUp.jsx";
 
 function App() {
   const { currentUser } = useSelector((state) => state.user);
@@ -20,6 +21,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/sign-up" element={<SignUp />} />
         <Route
           path="/*"
           element={currentUser ? <Dashboard /> : <Navigate to="/login" />}
