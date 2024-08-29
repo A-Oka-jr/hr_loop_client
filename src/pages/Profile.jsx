@@ -21,7 +21,7 @@ const Profile = () => {
           `/api/v1/company/get_by_id/${currentUser.user.company_id}`
         );
 
-        const data = response;
+        const data = response.data;
 
         if (data.success === false) {
           console.log(data.message);
@@ -29,17 +29,32 @@ const Profile = () => {
           setError(true);
           return;
         }
+
         setLoading(false);
-        setCompany(data.data);
+        setCompany(data);
       } catch (error) {
         console.error(error);
+        setLoading(false);
         setError(true);
       }
     };
+
     if (currentUser.user.role === "company_user") {
       getCompanyProfile();
     }
-  }, [currentUser.user.company_id]);
+  }, [currentUser]);
+
+  if (loading) {
+    return <div className="container mx-auto p-8">Loading...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-8 text-red-500">
+        Error loading company profile. Please try again later.
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-8">
@@ -73,7 +88,7 @@ const Profile = () => {
         </div>
 
         {/* Role-Specific Section */}
-        {currentUser.role === "job_seeker" ? (
+        {currentUser.user.role === "job_seeker" ? (
           <div className="bg-white p-6 shadow rounded-lg">
             <h2 className="text-2xl font-bold mb-4">Job Preferences</h2>
             <p>
