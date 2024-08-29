@@ -1,22 +1,49 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
 
 const SignUp = () => {
-  const { loading, error } = useSelector((state) => state.user);
   const [formData, setFormData] = useState({});
   const [activeTab, setActiveTab] = useState("job_seeker");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const handleTabSwitch = (tab) => {
     setActiveTab(tab);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (activeTab === "company") {
       formData.role = "company_user";
     }
+
     console.log(formData);
+
+    setLoading(true);
+
+    try {
+      const response = await axios.post("/api/v1/company/register", formData, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const data = response.data;
+
+      if (data.success === false) {
+        setLoading(false);
+        setError(data.message);
+        return;
+      }
+
+      setLoading(false);
+      setError(null);
+      navigate("/login");
+    } catch (error) {
+      setLoading(false);
+      setError(error.response.data.message);
+    }
   };
 
   const handleChange = (e) => {
@@ -53,13 +80,13 @@ const SignUp = () => {
           <div className="mb-4">
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="name"
+              htmlFor="user_name"
             >
-              Name
+              User Name
             </label>
             <input
               type="text"
-              id="name"
+              id="user_name"
               className="w-full px-3 py-2 border rounded-lg text-gray-700"
               placeholder="Enter your name"
               onChange={handleChange}
@@ -71,13 +98,13 @@ const SignUp = () => {
             <div className="mb-4">
               <label
                 className="block text-gray-700 text-sm font-bold mb-2"
-                htmlFor="company_name"
+                htmlFor="name"
               >
                 Company Name
               </label>
               <input
                 type="text"
-                id="company_name"
+                id="name"
                 className="w-full px-3 py-2 border rounded-lg text-gray-700"
                 placeholder="Enter your company name"
                 onChange={handleChange}
@@ -97,7 +124,24 @@ const SignUp = () => {
               type="email"
               id="email"
               className="w-full px-3 py-2 border rounded-lg text-gray-700"
-              placeholder="Enter your email"
+              placeholder="Enter your Company email"
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="user_email"
+            >
+              User Email
+            </label>
+            <input
+              type="email"
+              id="user_email"
+              className="w-full px-3 py-2 border rounded-lg text-gray-700"
+              placeholder="Enter your user email"
               onChange={handleChange}
               required
             />

@@ -3,6 +3,7 @@ import { AiFillHome, AiFillSetting, AiOutlineLogout } from "react-icons/ai";
 import { FaUserCircle } from "react-icons/fa";
 import { ImSearch } from "react-icons/im";
 import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 import {
   signOutUserStart,
@@ -13,6 +14,7 @@ import axios from "axios";
 
 const Sidebar = ({ onLogout }) => {
   const dispatch = useDispatch();
+  const { currentUser } = useSelector((state) => state.user);
 
   const handleLogout = async () => {
     try {
@@ -67,6 +69,17 @@ const Sidebar = ({ onLogout }) => {
               <span>Jobs</span>
             </Link>
           </li>
+          {currentUser?.user.role === "company_user" && (
+            <li className="mb-6">
+              <Link
+                to="/company-dashboard"
+                className="flex items-center space-x-4 p-3 text-lg hover:bg-white hover:bg-opacity-10 rounded-lg transition ease-in-out duration-300"
+              >
+                <AiFillSetting className="text-2xl" />
+                <span>Company Dashboard</span>
+              </Link>
+            </li>
+          )}
           <li className="mb-6">
             <Link
               to="/settings"

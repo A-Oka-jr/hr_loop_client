@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -11,8 +10,9 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import Jobs from "./pages/Jobs.jsx";
-import { useSelector } from "react-redux";
 import SignUp from "./pages/SignUp.jsx";
+import NotFound from "./pages/NotFound"; // Import the NotFound component
+import { useSelector } from "react-redux";
 
 function App() {
   const { currentUser } = useSelector((state) => state.user);
@@ -30,7 +30,11 @@ function App() {
           <Route path="profile" element={<Profile />} />
           <Route path="jobs" element={<Jobs />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="*" element={<NotFound />} />{" "}
+          {/* Catch-all route for 404 */}
         </Route>
+        <Route path="*" element={<NotFound />} />{" "}
+        {/* Fallback for any undefined routes */}
       </Routes>
     </Router>
   );
