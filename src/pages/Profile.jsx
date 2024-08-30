@@ -1,16 +1,17 @@
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Navigate } from "react-router-dom";
 
 const Profile = () => {
   const { currentUser } = useSelector((state) => state.user);
-  const [company, setCompany] = useState({});
+  const [data, setData] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
   useEffect(() => {
     if (!currentUser) {
-      window.location.href = "/login";
+      Navigate("/login");
     }
     const getCompanyProfile = async () => {
       setError(false);
@@ -18,7 +19,7 @@ const Profile = () => {
 
       try {
         const response = await axios.get(
-          `/api/v1/company/get_by_id/${currentUser.user.company_id}`
+          `/api/v1/company_users/get_by_user_id/${currentUser.user.id}`
         );
 
         const data = response.data;
@@ -31,7 +32,7 @@ const Profile = () => {
         }
 
         setLoading(false);
-        setCompany(data);
+        setData(data);
       } catch (error) {
         console.error(error);
         setLoading(false);
@@ -67,7 +68,9 @@ const Profile = () => {
         <div>
           <h1 className="text-3xl font-bold">{currentUser.name}</h1>
           <span className="text-blue-500">
-            {currentUser.role === "job_seeker" ? "Job Seeker" : company.name}
+            {currentUser.role === "job_seeker"
+              ? "Job Seeker"
+              : data.company?.name}
           </span>
         </div>
       </div>
@@ -77,13 +80,13 @@ const Profile = () => {
         <div className="bg-white p-6 shadow rounded-lg">
           <h2 className="text-2xl font-bold mb-4">General Information</h2>
           <p>
-            <strong>Email:</strong> {company.email}
+            <strong>Email:</strong> {data.company?.email}
           </p>
           <p>
-            <strong>Phone:</strong> {company.phone}
+            <strong>Phone:</strong> {data.company?.phone}
           </p>
           <p>
-            <strong>Address:</strong> {company.address}
+            <strong>Address:</strong> {data.company?.address}
           </p>
         </div>
 
@@ -110,10 +113,10 @@ const Profile = () => {
           <div className="bg-white p-6 shadow rounded-lg">
             <h2 className="text-2xl font-bold mb-4">Company Overview</h2>
             <p>
-              <strong>Industry:</strong> {company.industry}
+              <strong>Industry:</strong> {data.company?.industry}
             </p>
             <p>
-              <strong>Company Size:</strong> {company.companySize}
+              <strong>Company Size:</strong> {data.company?.company_size}
             </p>
             {/* <p>
               <strong>Open Positions:</strong>{" "}
