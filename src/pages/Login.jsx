@@ -31,6 +31,10 @@ const Login = () => {
       }
 
       dispatch(signinSuccess(data));
+      if (!data.user.role) {
+        navigate("/subscription_plans");
+        return;
+      }
       navigate("/");
     } catch (error) {
       dispatch(

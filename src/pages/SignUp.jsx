@@ -5,27 +5,19 @@ import axios from "axios";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({});
-  const [activeTab, setActiveTab] = useState("job_seeker");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const handleTabSwitch = (tab) => {
-    setActiveTab(tab);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (activeTab === "company") {
-      formData.role = "company_user";
-    }
 
     console.log(formData);
 
     setLoading(true);
 
     try {
-      const response = await axios.post("/api/v1/company/register", formData, {
+      const response = await axios.post("/api/v1/auth/register", formData, {
         headers: { "Content-Type": "application/json" },
       });
 
@@ -52,67 +44,43 @@ const SignUp = () => {
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-96">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-1/3">
         <h2 className="text-3xl font-bold mb-4 text-center">Sign Up</h2>
-        <div className="flex justify-around mb-6">
-          <button
-            className={`${
-              activeTab === "job_seeker"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-gray-700"
-            } px-4 py-2 rounded-lg`}
-            onClick={() => handleTabSwitch("job_seeker")}
-          >
-            Job Seeker
-          </button>
-          <button
-            className={`${
-              activeTab === "company"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-gray-700"
-            } px-4 py-2 rounded-lg`}
-            onClick={() => handleTabSwitch("company")}
-          >
-            Company
-          </button>
-        </div>
+
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="user_name"
+              htmlFor="first_name"
             >
-              User Name
+              First Name
             </label>
             <input
               type="text"
-              id="user_name"
+              id="first_name"
               className="w-full px-3 py-2 border rounded-lg text-gray-700"
-              placeholder="Enter your name"
+              placeholder="Enter your first name"
               onChange={handleChange}
               required
             />
           </div>
 
-          {activeTab === "company" && (
-            <div className="mb-4">
-              <label
-                className="block text-gray-700 text-sm font-bold mb-2"
-                htmlFor="name"
-              >
-                Company Name
-              </label>
-              <input
-                type="text"
-                id="name"
-                className="w-full px-3 py-2 border rounded-lg text-gray-700"
-                placeholder="Enter your company name"
-                onChange={handleChange}
-                required
-              />
-            </div>
-          )}
-
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="last_name"
+            >
+              Last Name
+            </label>
+            <input
+              type="text"
+              id="last_name"
+              className="w-full px-3 py-2 border rounded-lg text-gray-700"
+              placeholder="Enter your last name"
+              onChange={handleChange}
+              required
+            />
+          </div>
           <div className="mb-4">
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
@@ -125,23 +93,6 @@ const SignUp = () => {
               id="email"
               className="w-full px-3 py-2 border rounded-lg text-gray-700"
               placeholder="Enter your Company email"
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="user_email"
-            >
-              User Email
-            </label>
-            <input
-              type="email"
-              id="user_email"
-              className="w-full px-3 py-2 border rounded-lg text-gray-700"
-              placeholder="Enter your user email"
               onChange={handleChange}
               required
             />
@@ -163,27 +114,6 @@ const SignUp = () => {
               required
             />
           </div>
-
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="company_role"
-            >
-              Company Role
-            </label>
-            <select
-              id="company_role"
-              className="w-full px-3 py-2 border rounded-lg text-gray-700"
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select Role</option>
-              <option value="owner">Owner</option>
-              <option value="mnager">Manager</option>
-              <option value="recruiter">Recruiter</option>
-            </select>
-          </div>
-
           <button
             disabled={loading}
             type="submit"

@@ -8,10 +8,11 @@ import Dashboard from "./components/Dashboard";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
+import SubscriptionPlans from "./pages/SubscriptionPlans";
 import Login from "./pages/Login";
 import Jobs from "./pages/Jobs.jsx";
 import SignUp from "./pages/SignUp.jsx";
-import NotFound from "./pages/NotFound"; // Import the NotFound component
+import NotFound from "./pages/NotFound";
 import { useSelector } from "react-redux";
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
           <Route path="profile" element={<Profile />} />
           <Route path="jobs" element={<Jobs />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="subscription_plans" element={<SubscriptionPlans />} />
           <Route path="*" element={<NotFound />} />{" "}
           {/* Catch-all route for 404 */}
         </Route>
