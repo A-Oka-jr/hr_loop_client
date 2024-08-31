@@ -119,7 +119,7 @@ const SubscriptionPlans = () => {
                   ${plan.price}
                 </span>
                 <span className="text-base font-medium text-gray-500">
-                  /month
+                  /{plan.duration}
                 </span>
               </div>
               <div className="mt-8">
