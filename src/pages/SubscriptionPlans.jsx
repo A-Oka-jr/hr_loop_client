@@ -1,20 +1,20 @@
-// SubscriptionPlans.js
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaGift, FaMedal, FaGem } from "react-icons/fa";
 import PaymentDialog from "../components/PaymentDialog";
+import CompanyDetailsDialog from "../components/CompanyDetailsDialog";
 
 const SubscriptionPlans = () => {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isCompanyDialogOpen, setIsCompanyDialogOpen] = useState(false);
+  const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    // Fetch subscription plans from the API
     const fetchPlans = async () => {
       setLoading(true);
       setError(false);
@@ -44,7 +44,7 @@ const SubscriptionPlans = () => {
   const handleChoosePlan = (plan) => {
     setSelectedPlan(plan);
     if (plan.type === "premium" || plan.type === "professional") {
-      setIsDialogOpen(true);
+      setIsCompanyDialogOpen(true);
     } else {
       processPlanSelection(plan.id);
     }
@@ -54,13 +54,36 @@ const SubscriptionPlans = () => {
     setLoading(true);
     try {
       const response = await axios.post(`/api/v1/choose_plan`, { planId });
-      // Handle the response (e.g., show a success message, update UI)
       console.log(response.data);
       setLoading(false);
     } catch (error) {
       console.error("Error choosing plan:", error);
       setLoading(false);
-      // Optionally, set an error state or show an error message
+    }
+  };
+
+  const handleCompanyDetailsSubmit = async (companyDetails) => {
+    setError(null);
+    console.log(companyDetails);
+
+    return;
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        "/api/v1/create_company",
+        companyDetails
+      );
+      if (response.data.success) {
+        setIsCompanyDialogOpen(false);
+        setIsPaymentDialogOpen(true);
+      } else {
+        setError(response.data.message);
+        console.error("Error creating company:", response.data.message);
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error("Error creating company:", error);
+      setLoading(false);
     }
   };
 
@@ -71,17 +94,16 @@ const SubscriptionPlans = () => {
         planId: selectedPlan.id,
         paymentDetails,
       });
-      // Handle the response (e.g., show a success message, update UI)
       console.log(response.data);
       setSelectedPlan(null); // Clear selection after successful payment
     } catch (error) {
       console.error("Error processing payment:", error);
-      // Optionally, set an error state or show an error message
     }
   };
 
-  const handleCloseDialog = () => {
-    setIsDialogOpen(false);
+  const handleCloseDialogs = () => {
+    setIsCompanyDialogOpen(false);
+    setIsPaymentDialogOpen(false);
   };
 
   return (
@@ -97,7 +119,6 @@ const SubscriptionPlans = () => {
           >
             <div className="p-6">
               <div className="flex justify-center">
-                {/* Choose an icon based on the plan type */}
                 {plan.type === "free" && (
                   <FaGift className="text-indigo-600 text-4xl" />
                 )}
@@ -135,10 +156,17 @@ const SubscriptionPlans = () => {
         ))}
       </div>
 
+      {/* Company Details Dialog */}
+      <CompanyDetailsDialog
+        isOpen={isCompanyDialogOpen}
+        onClose={handleCloseDialogs}
+        onNext={handleCompanyDetailsSubmit}
+      />
+
       {/* Payment Dialog */}
       <PaymentDialog
-        isOpen={isDialogOpen}
-        onClose={handleCloseDialog}
+        isOpen={isPaymentDialogOpen}
+        onClose={handleCloseDialogs}
         onConfirm={handlePayment}
         plan={selectedPlan}
       />
