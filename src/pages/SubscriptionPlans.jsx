@@ -3,9 +3,11 @@ import axios from "axios";
 import { FaGift, FaMedal, FaGem } from "react-icons/fa";
 import PaymentDialog from "../components/PaymentDialog";
 import CompanyDetailsDialog from "../components/CompanyDetailsDialog";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { updateUserRole } from "../redux/user/userSlice"; // Import your action to update the role
 
 const SubscriptionPlans = () => {
+  const dispatch = useDispatch();
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -104,6 +106,18 @@ const SubscriptionPlans = () => {
 
       if (response.data.success) {
         console.log("Payment successful:");
+
+        const newRole = "company_user";
+        dispatch(updateUserRole(newRole));
+
+        const updatedUser = {
+          ...currentUser.user,
+          role: newRole,
+        };
+        localStorage.setItem(
+          "currentUser",
+          JSON.stringify({ user: updatedUser })
+        );
       } else {
         console.error("Error processing payment:", response.data.message);
       }

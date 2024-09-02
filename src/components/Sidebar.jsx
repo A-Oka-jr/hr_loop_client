@@ -43,61 +43,62 @@ const Sidebar = ({ onLogout }) => {
       </div>
       <nav className="flex-1 p-4">
         <ul>
-          {currentUser?.user.role &&
-            ((
-              <li className="mb-6">
-                <Link
-                  to="/"
-                  className="flex items-center space-x-4 p-3 text-lg hover:bg-white hover:bg-opacity-10 rounded-lg transition ease-in-out duration-300"
-                >
-                  <AiFillHome className="text-2xl" />
-                  <span>Home</span>
-                </Link>
-              </li>
-            ),
-            (
-              <li className="mb-6">
-                <Link
-                  to="/profile"
-                  className="flex items-center space-x-4 p-3 text-lg hover:bg-white hover:bg-opacity-10 rounded-lg transition ease-in-out duration-300"
-                >
-                  <FaUserCircle className="text-2xl" />
-                  <span>Profile</span>
-                </Link>
-              </li>
-            ),
-            (
-              <li className="mb-6">
-                <Link
-                  to="/jobs"
-                  className="flex items-center space-x-4 p-3 text-lg hover:bg-white hover:bg-opacity-10 rounded-lg transition ease-in-out duration-300"
-                >
-                  <ImSearch className="text-2xl" />
-                  <span>Jobs</span>
-                </Link>
-              </li>
-            ),
-            (
-              <li className="mb-6">
-                <Link
-                  to="/settings"
-                  className="flex items-center space-x-4 p-3 text-lg hover:bg-white hover:bg-opacity-10 rounded-lg transition ease-in-out duration-300"
-                >
-                  <AiFillSetting className="text-2xl" />
-                  <span>Settings</span>
-                </Link>
-              </li>
-            ))}
+          {currentUser?.user.role && (
+            <li className="mb-6">
+              <Link
+                to="/"
+                className="flex items-center space-x-4 p-3 text-lg hover:bg-white hover:bg-opacity-10 rounded-lg transition ease-in-out duration-300"
+              >
+                <AiFillHome className="text-2xl" />
+                <span>Home</span>
+              </Link>
+            </li>
+          )}
+          {currentUser?.user.role && (
+            <li className="mb-6">
+              <Link
+                to="/profile"
+                className="flex items-center space-x-4 p-3 text-lg hover:bg-white hover:bg-opacity-10 rounded-lg transition ease-in-out duration-300"
+              >
+                <FaUserCircle className="text-2xl" />
+                <span>Profile</span>
+              </Link>
+            </li>
+          )}
+          {currentUser?.user.role && (
+            <li className="mb-6">
+              <Link
+                to="/jobs"
+                className="flex items-center space-x-4 p-3 text-lg hover:bg-white hover:bg-opacity-10 rounded-lg transition ease-in-out duration-300"
+              >
+                <ImSearch className="text-2xl" />
+                <span>Jobs</span>
+              </Link>
+            </li>
+          )}
+          {currentUser?.user.role && (
+            <li className="mb-6">
+              <Link
+                to="/settings"
+                className="flex items-center space-x-4 p-3 text-lg hover:bg-white hover:bg-opacity-10 rounded-lg transition ease-in-out duration-300"
+              >
+                <AiFillSetting className="text-2xl" />
+                <span>Settings</span>
+              </Link>
+            </li>
+          )}
 
-          <li className="mb-6">
-            <Link
-              to="/subscription_plans"
-              className="flex items-center space-x-4 p-3 text-lg hover:bg-white hover:bg-opacity-10 rounded-lg transition ease-in-out duration-300"
-            >
-              <FaGem className="text-2xl" />
-              <span>Subscription Plans</span>
-            </Link>
-          </li>
+          {currentUser?.user.role === "company_user" && (
+            <li className="mb-6">
+              <Link
+                to="/subscription_plans"
+                className="flex items-center space-x-4 p-3 text-lg hover:bg-white hover:bg-opacity-10 rounded-lg transition ease-in-out duration-300"
+              >
+                <FaGem className="text-2xl" />
+                <span>Subscription Plans</span>
+              </Link>
+            </li>
+          )}
         </ul>
       </nav>
       <div className="p-4">

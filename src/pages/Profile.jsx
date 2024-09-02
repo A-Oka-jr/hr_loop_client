@@ -22,7 +22,7 @@ const Profile = () => {
           `/api/v1/company_users/get_by_user_id/${currentUser.user.id}`
         );
 
-        const data = response.data;
+        const data = response.data.data;
 
         if (data.success === false) {
           console.log(data.message);
