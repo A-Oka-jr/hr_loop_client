@@ -8,6 +8,7 @@ const CompanyDetailsDialog = ({ isOpen, onClose, onNext }) => {
   const [phone, setCompanyPhone] = useState("");
   const [company_size, setCompanySize] = useState("");
   const [image, setCompanyImage] = useState("");
+  const [role, setRole] = useState("");
 
   const handleNext = () => {
     onNext({
@@ -18,6 +19,7 @@ const CompanyDetailsDialog = ({ isOpen, onClose, onNext }) => {
       phone,
       company_size,
       image,
+      role,
     });
   };
 
@@ -93,6 +95,26 @@ const CompanyDetailsDialog = ({ isOpen, onClose, onNext }) => {
               placeholder="Enter company size"
               required
             />
+          </div>
+
+          <div className="mt-6">
+            <label
+              htmlFor="role"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Company Role
+            </label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              id="role"
+              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+            >
+              <option value="">Select One</option>
+              <option value="owner">Owner</option>
+              <option value="manager">Manager</option>
+              <option value="recruiter">Recruiter</option>
+            </select>
           </div>
 
           <div className="mt-6">

@@ -3,6 +3,7 @@ import axios from "axios";
 import { FaGift, FaMedal, FaGem } from "react-icons/fa";
 import PaymentDialog from "../components/PaymentDialog";
 import CompanyDetailsDialog from "../components/CompanyDetailsDialog";
+import { useSelector } from "react-redux";
 
 const SubscriptionPlans = () => {
   const [plans, setPlans] = useState([]);
@@ -11,6 +12,8 @@ const SubscriptionPlans = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [isCompanyDialogOpen, setIsCompanyDialogOpen] = useState(false);
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
+  const [companyId, setCompanyId] = useState(null);
+  const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -20,7 +23,7 @@ const SubscriptionPlans = () => {
       setError(false);
       try {
         const response = await axios.get("/api/v1/subscription_plans/");
-        const data = response.data;
+        const data = response.data.data;
 
         if (data.success === false) {
           console.log(data.message);
@@ -53,8 +56,7 @@ const SubscriptionPlans = () => {
   const processPlanSelection = async (planId) => {
     setLoading(true);
     try {
-      const response = await axios.post(`/api/v1/choose_plan`, { planId });
-      console.log(response.data);
+      const response = await axios.post(`/api/v1/payments/create`, { planId });
       setLoading(false);
     } catch (error) {
       console.error("Error choosing plan:", error);
@@ -64,16 +66,17 @@ const SubscriptionPlans = () => {
 
   const handleCompanyDetailsSubmit = async (companyDetails) => {
     setError(null);
-    console.log(companyDetails);
-
-    return;
+    companyDetails.user_id = currentUser.user.id;
+    companyDetails.subscription_plan_id = selectedPlan.id;
     try {
       setLoading(true);
       const response = await axios.post(
-        "/api/v1/create_company",
+        "/api/v1/company/create",
         companyDetails
       );
+
       if (response.data.success) {
+        setCompanyId(response.data.company.id); // Store the company_id
         setIsCompanyDialogOpen(false);
         setIsPaymentDialogOpen(true);
       } else {
@@ -88,13 +91,22 @@ const SubscriptionPlans = () => {
   };
 
   const handlePayment = async (paymentDetails) => {
-    console.log("Processing payment for", selectedPlan.name, paymentDetails);
+    paymentDetails.company_id = companyId;
+    paymentDetails.subscription_plan_id = selectedPlan.id;
+    paymentDetails.amount = selectedPlan.price; // Pass the plan amount
+    paymentDetails.status = "success";
+
     try {
-      const response = await axios.post(`/api/v1/choose_plan`, {
-        planId: selectedPlan.id,
-        paymentDetails,
-      });
-      console.log(response.data);
+      const response = await axios.post(
+        `/api/v1/payments/create`,
+        paymentDetails
+      );
+
+      if (response.data.success) {
+        console.log("Payment successful:");
+      } else {
+        console.error("Error processing payment:", response.data.message);
+      }
       setSelectedPlan(null); // Clear selection after successful payment
     } catch (error) {
       console.error("Error processing payment:", error);
