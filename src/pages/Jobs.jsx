@@ -1,102 +1,62 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import JobFormDialog from "../components/JobFormDialog";
+import RequirementsDialog from "../components/RequirementsDialog"; // Import the new dialog
+import axios from "axios";
 
 const Jobs = () => {
+  const { currentUser } = useSelector((state) => state.user);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isRequirementsDialogOpen, setIsRequirementsDialogOpen] =
+    useState(false); // State for requirements dialog
   const [currentPage, setCurrentPage] = useState(1);
   const jobsPerPage = 5;
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [editingJob, setEditingJob] = useState(null);
+  const [selectedRequirements, setSelectedRequirements] = useState(null); // State for selected requirements
   const statusColors = {
     closed: "bg-red-100 hover:bg-red-300",
-    opend: "bg-blue-100 hover:bg-blue-300",
+    opened: "bg-blue-100 hover:bg-blue-300",
   };
 
-  const [jobs, setJobs] = useState([
-    {
-      title: "Software Developer",
-      description: "We are looking for a software developer to join our team.",
-      requirements:
-        "Bachelor's degree in Computer Science or equivalent experience",
-      location: "ksa",
-      type: "remote",
-      status: "closed",
-      posted_date: "2022-01-01",
-    },
-    {
-      title: "Data Scientist",
-      description: "We are looking for a data scientist to join our team.",
-      requirements:
-        "Bachelor's degree in Computer Science or equivalent experience",
-      location: "usa",
-      type: "full_time",
-      status: "opend",
-      posted_date: "2022-01-01",
-    },
-    {
-      title: "Product Manager",
-      description: "We are looking for a product manager to join our team.",
-      requirements:
-        "Bachelor's degree in Computer Science or equivalent experience",
-      location: "uae",
-      type: "full_time",
-      status: "closed",
-      posted_date: "2022-01-01",
-    },
-    {
-      title: "Frontend Developer",
-      description: "We are looking for a frontend developer to join our team.",
-      requirements:
-        "Bachelor's degree in Computer Science or equivalent experience",
-      location: "uae",
-      type: "part_time",
-      status: "opend",
-      posted_date: "2022-01-01",
-    },
-    {
-      title: "Backend Developer",
-      description: "We are looking for a backend developer to join our team.",
-      requirements:
-        "Bachelor's degree in Computer Science or equivalent experience",
-      location: "uae",
-      type: "full_time",
-      status: "opend",
-      posted_date: "2022-01-01",
-    },
-    {
-      title: "Full Stack Developer",
-      description:
-        "We are looking for a full stack developer to join our team.",
-      requirements:
-        "Bachelor's degree in Computer Science or equivalent experience",
-      location: "uae",
-      type: "full_time",
-      status: "opend",
-      posted_date: "2022-01-01",
-    },
-    {
-      title: "UI/UX Designer",
-      description: "We are looking for a UI/UX designer to join our team.",
-      requirements:
-        "Bachelor's degree in Computer Science or equivalent experience",
-      location: "uae",
-      type: "full_time",
-      status: "closed",
-      posted_date: "2022-01-01",
-    },
-    {
-      title: "Mobile Developer",
-      description: "We are looking for a mobile developer to join our team.",
-      requirements:
-        "Bachelor's degree in Computer Science or equivalent experience",
-      location: "uae",
-      type: "full_time",
-      status: "closed",
-      posted_date: "2022-01-01",
-    },
-  ]); // Dummy state to store job listings
+  const [jobs, setJobs] = useState([]);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      setError(false);
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          `/api/v1/jobs/get_by_company_id/${currentUser.user.company_id}`
+        );
+        const data = response.data.data;
+
+        if (data.success === false) {
+          setLoading(false);
+          setError(true);
+          console.log(data.message);
+          return;
+        }
+        setLoading(false);
+        setError(false);
+        setJobs(data);
+      } catch (error) {
+        setLoading(false);
+        setError(true);
+        console.error(error);
+      }
+    };
+    fetchJobs();
+  }, [currentUser]);
 
   const handleAddJobClick = () => {
+    setEditingJob(null);
+    setIsDialogOpen(true);
+  };
+
+  const handleEditJobClick = (job) => {
+    setEditingJob(job);
     setIsDialogOpen(true);
   };
 
@@ -104,9 +64,75 @@ const Jobs = () => {
     setIsDialogOpen(false);
   };
 
-  const handleJobSubmit = (jobData) => {
-    setJobs([...jobs, jobData]); // Add the new job to the job listings
-    setIsDialogOpen(false); // Close the dialog
+  const handleRequirementsClick = (requirements) => {
+    setSelectedRequirements(requirements); // Set the requirements data
+    setIsRequirementsDialogOpen(true); // Open the requirements dialog
+  };
+
+  const handleRequirementsDialogClose = () => {
+    setIsRequirementsDialogOpen(false);
+  };
+
+  const handleDeleteJobClick = async (id) => {
+    if (confirm("Are you sure you want to delete this job?")) {
+      try {
+        const response = await axios.delete(`/api/v1/jobs/delete/${id}`);
+        const deletedJob = response.data.data;
+        if (deletedJob.success === false) {
+          console.log(deletedJob.message);
+          return;
+        }
+        setJobs(jobs.filter((job) => job.id !== id));
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
+  const handleJobSubmit = async (jobData) => {
+    setError(false);
+    setLoading(true);
+    try {
+      if (editingJob) {
+        const response = await axios.put(
+          `/api/v1/jobs/update/${editingJob.id}`,
+          jobData
+        );
+        const updatedJob = response.data.data;
+
+        if (updatedJob.success === false) {
+          console.log(response.data.message);
+          setError(true);
+          setLoading(false);
+          return;
+        }
+
+        setJobs(
+          jobs.map((job) => (job.id === editingJob.id ? updatedJob : job))
+        );
+      } else {
+        jobData.company_id = currentUser.user.company_id;
+        const response = await axios.post("/api/v1/jobs/create", jobData);
+        const newJob = response.data.data;
+
+        if (newJob.success === false) {
+          console.log(response.data.message);
+          setError(true);
+          setLoading(false);
+          return;
+        }
+
+        setJobs([...jobs, newJob]);
+      }
+
+      setLoading(false);
+      setIsDialogOpen(false);
+      setEditingJob(null); // Reset the editingJob state
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+      setError(true);
+    }
   };
 
   const handlePageChange = (newPage) => {
@@ -118,10 +144,6 @@ const Jobs = () => {
     currentPage * jobsPerPage
   );
   const totalPages = Math.ceil(jobs.length / jobsPerPage);
-
-  const countStatus = (status) => {
-    return jobs.filter((jobs) => jobs.status === status).length;
-  };
 
   return (
     <div className="overflow-x-auto">
@@ -170,7 +192,6 @@ const Jobs = () => {
           </tr>
         </thead>
         <tbody>
-          {/* Render job listings here */}
           {paginatedJobs.map((job, index) => (
             <tr
               key={index}
@@ -182,8 +203,11 @@ const Jobs = () => {
               <td className="py-3 px-6 border-b border-gray-200">
                 {job.description}
               </td>
-              <td className="py-3 px-6 border-b border-gray-200">
-                {job.requirements}
+              <td
+                className="py-3 px-6 border-b border-gray-200 cursor-pointer"
+                onClick={() => handleRequirementsClick(job.requirements)}
+              >
+                {job.requirements.position}
               </td>
               <td className="py-3 px-6 border-b border-gray-200">
                 {job.location}
@@ -203,11 +227,17 @@ const Jobs = () => {
               </td>
               <td className="py-3 px-6 border-b border-gray-200">
                 <div className="flex">
-                  <button className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600">
+                  <button
+                    className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 mr-2"
+                    onClick={() => handleEditJobClick(job)}
+                  >
                     Edit
                   </button>
 
-                  <button className="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 ml-2">
+                  <button
+                    className="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 mr-2"
+                    onClick={() => handleDeleteJobClick(job.id)}
+                  >
                     Delete
                   </button>
                 </div>
@@ -217,31 +247,35 @@ const Jobs = () => {
         </tbody>
       </table>
 
-      <div className="flex justify-between items-center mt-4">
-        <button
-          className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l"
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
-        <span>
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r"
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
+      <div className="flex justify-center mt-4">
+        {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+          (pageNumber) => (
+            <button
+              key={pageNumber}
+              onClick={() => handlePageChange(pageNumber)}
+              className={`${
+                currentPage === pageNumber
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-300 text-gray-700"
+              } py-2 px-4 rounded-lg mx-1`}
+            >
+              {pageNumber}
+            </button>
+          )
+        )}
       </div>
 
-      {/* Job Form Dialog */}
       <JobFormDialog
         isOpen={isDialogOpen}
         onClose={handleDialogClose}
         onSubmit={handleJobSubmit}
+        initialData={editingJob}
+      />
+
+      <RequirementsDialog
+        isOpen={isRequirementsDialogOpen}
+        onClose={handleRequirementsDialogClose}
+        requirements={selectedRequirements}
       />
     </div>
   );
