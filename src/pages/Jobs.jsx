@@ -1,26 +1,28 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import JobFormDialog from "../components/JobFormDialog";
-import RequirementsDialog from "../components/RequirementsDialog"; // Import the new dialog
+import RequirementsDialog from "../components/RequirementsDialog";
+import { AiFillDelete, AiFillEdit } from "react-icons/ai";
 import axios from "axios";
 
 const Jobs = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isRequirementsDialogOpen, setIsRequirementsDialogOpen] =
-    useState(false); // State for requirements dialog
+    useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const jobsPerPage = 5;
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [editingJob, setEditingJob] = useState(null);
-  const [selectedRequirements, setSelectedRequirements] = useState(null); // State for selected requirements
+  const [selectedRequirements, setSelectedRequirements] = useState(null);
+  const [activeTab, setActiveTab] = useState("postJob"); // State for active tab
+  const [jobs, setJobs] = useState([]);
+
   const statusColors = {
-    closed: "bg-red-100 hover:bg-red-300",
+    closed: "bg-gray-100 hover:bg-gray-300",
     opened: "bg-blue-100 hover:bg-blue-300",
   };
-
-  const [jobs, setJobs] = useState([]);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -47,8 +49,11 @@ const Jobs = () => {
         console.error(error);
       }
     };
-    fetchJobs();
-  }, [currentUser]);
+
+    if (activeTab === "postJob") {
+      fetchJobs();
+    }
+  }, [currentUser, activeTab]);
 
   const handleAddJobClick = () => {
     setEditingJob(null);
@@ -65,8 +70,8 @@ const Jobs = () => {
   };
 
   const handleRequirementsClick = (requirements) => {
-    setSelectedRequirements(requirements); // Set the requirements data
-    setIsRequirementsDialogOpen(true); // Open the requirements dialog
+    setSelectedRequirements(requirements);
+    setIsRequirementsDialogOpen(true);
   };
 
   const handleRequirementsDialogClose = () => {
@@ -127,7 +132,7 @@ const Jobs = () => {
 
       setLoading(false);
       setIsDialogOpen(false);
-      setEditingJob(null); // Reset the editingJob state
+      setEditingJob(null);
     } catch (error) {
       console.error(error);
       setLoading(false);
@@ -147,136 +152,205 @@ const Jobs = () => {
 
   return (
     <div className="overflow-x-auto">
-      <h1 className="text-2xl font-semibold mb-4">Jobs Status Table</h1>
-      {loading && <p className="text-center my-7 text-2xl">Loading...</p>}
-      {error && (
-        <p className="text-center my-7 text-2xl text-red-500">
-          Something went wrong
-        </p>
-      )}
-
-      <button
-        className="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 mb-4"
-        onClick={handleAddJobClick}
-      >
-        Add Job
-      </button>
-
-      <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
-        <thead>
-          <tr>
-            <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
-              Title
-            </th>
-            <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
-              Description
-            </th>
-            <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
-              Requirements
-            </th>
-            <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
-              Location
-            </th>
-            <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
-              Type
-            </th>
-            <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
-              Posted Date
-            </th>
-            <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
-              Status
-            </th>
-            <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {paginatedJobs.map((job, index) => (
-            <tr
-              key={index}
-              className={`cursor-pointer ${statusColors[job.status]}`}
-            >
-              <td className="py-3 px-6 border-b border-gray-200">
-                {job.title}
-              </td>
-              <td className="py-3 px-6 border-b border-gray-200">
-                {job.description}
-              </td>
-              <td
-                className="py-3 px-6 border-b border-gray-200 cursor-pointer"
-                onClick={() => handleRequirementsClick(job.requirements)}
-              >
-                {job.requirements.position}
-              </td>
-              <td className="py-3 px-6 border-b border-gray-200">
-                {job.location}
-              </td>
-              <td className="py-3 px-6 border-b border-gray-200">
-                {job.type === "full_time"
-                  ? "Full Time"
-                  : job.type === "Part Time"
-                  ? "Part Time"
-                  : "Remote"}
-              </td>
-              <td className="py-3 px-6 border-b border-gray-200">
-                {new Date(job.posted_date).toLocaleDateString()}
-              </td>
-              <td className="py-3 px-6 border-b border-gray-200">
-                {job.status}
-              </td>
-              <td className="py-3 px-6 border-b border-gray-200">
-                <div className="flex">
-                  <button
-                    className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 mr-2"
-                    onClick={() => handleEditJobClick(job)}
-                  >
-                    Edit
-                  </button>
-
-                  <button
-                    className="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 mr-2"
-                    onClick={() => handleDeleteJobClick(job.id)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <div className="flex justify-center mt-4">
-        {Array.from({ length: totalPages }, (_, index) => index + 1).map(
-          (pageNumber) => (
-            <button
-              key={pageNumber}
-              onClick={() => handlePageChange(pageNumber)}
-              className={`${
-                currentPage === pageNumber
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-300 text-gray-700"
-              } py-2 px-4 rounded-lg mx-1`}
-            >
-              {pageNumber}
-            </button>
-          )
-        )}
+      {/* Tabs */}
+      <div className="flex mb-4">
+        <button
+          onClick={() => setActiveTab("postJob")}
+          className={`py-2 px-4 rounded-t-lg focus:outline-none ${
+            activeTab === "postJob"
+              ? "bg-primary text-white"
+              : "bg-gray-300 text-gray-700"
+          }`}
+        >
+          Post Job
+        </button>
+        <button
+          onClick={() => setActiveTab("findCandidates")}
+          className={`py-2 px-4 rounded-t-lg focus:outline-none ml-2 ${
+            activeTab === "findCandidates"
+              ? "bg-primary text-white"
+              : "bg-gray-300 text-gray-700"
+          }`}
+        >
+          Find Candidates
+        </button>
       </div>
 
-      <JobFormDialog
-        isOpen={isDialogOpen}
-        onClose={handleDialogClose}
-        onSubmit={handleJobSubmit}
-        initialData={editingJob}
-      />
+      {activeTab === "postJob" && (
+        <>
+          <h1 className="text-2xl font-semibold mb-4">Jobs Status Table</h1>
+          {loading && <p className="text-center my-7 text-2xl">Loading...</p>}
+          {error && (
+            <p className="text-center my-7 text-2xl text-red-500">
+              Something went wrong
+            </p>
+          )}
 
-      <RequirementsDialog
-        isOpen={isRequirementsDialogOpen}
-        onClose={handleRequirementsDialogClose}
-        requirements={selectedRequirements}
-      />
+          <button
+            className="bg-primary text-white py-2 px-4 rounded-lg hover:bg-violet-950 mb-4"
+            onClick={handleAddJobClick}
+          >
+            Add Job
+          </button>
+
+          <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+            <thead>
+              <tr>
+                <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
+                  Title
+                </th>
+                <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
+                  Description
+                </th>
+                <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
+                  Requirements
+                </th>
+                <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
+                  Location
+                </th>
+                <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
+                  Type
+                </th>
+                <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
+                  Posted Date
+                </th>
+                <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
+                  Status
+                </th>
+                <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedJobs.map((job, index) => (
+                <tr
+                  key={index}
+                  className={`cursor-pointer ${statusColors[job.status]}`}
+                >
+                  <td className="py-3 px-6 border-b border-gray-200">
+                    {job.title}
+                  </td>
+                  <td className="py-3 px-6 border-b border-gray-200">
+                    {job.description}
+                  </td>
+                  <td
+                    className="py-3 px-6 border-b border-gray-200 cursor-pointer"
+                    onClick={() => handleRequirementsClick(job.requirements)}
+                  >
+                    {job.requirements.position}
+                  </td>
+                  <td className="py-3 px-6 border-b border-gray-200">
+                    {job.location}
+                  </td>
+                  <td className="py-3 px-6 border-b border-gray-200">
+                    {job.type === "full_time"
+                      ? "Full Time"
+                      : job.type === "Part Time"
+                      ? "Part Time"
+                      : "Remote"}
+                  </td>
+                  <td className="py-3 px-6 border-b border-gray-200">
+                    {new Date(job.posted_date).toLocaleDateString()}
+                  </td>
+                  <td className="py-3 px-6 border-b border-gray-200">
+                    {job.status}
+                  </td>
+                  <td className="py-3 px-6 border-b border-gray-200">
+                    <div className="flex">
+                      <AiFillEdit
+                        title="Edit Job"
+                        className="text-green-400 text-xl hover:text-green-600 mr-2"
+                        onClick={() => handleEditJobClick(job)}
+                      >
+                        Edit
+                      </AiFillEdit>
+
+                      <AiFillDelete
+                        title="Delete Job"
+                        className="text-red-400  text-xl hover:text-red-600 mr-2"
+                        onClick={() => handleDeleteJobClick(job.id)}
+                      >
+                        Delete
+                      </AiFillDelete>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div className="flex justify-center mt-4">
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+              (pageNumber) => (
+                <button
+                  key={pageNumber}
+                  onClick={() => handlePageChange(pageNumber)}
+                  className={`${
+                    currentPage === pageNumber
+                      ? "bg-primary text-white"
+                      : "bg-gray-300 text-gray-700"
+                  } py-2 px-4 rounded-lg mx-1`}
+                >
+                  {pageNumber}
+                </button>
+              )
+            )}
+          </div>
+
+          <JobFormDialog
+            isOpen={isDialogOpen}
+            onClose={handleDialogClose}
+            onSubmit={handleJobSubmit}
+            initialData={editingJob}
+          />
+
+          <RequirementsDialog
+            isOpen={isRequirementsDialogOpen}
+            onClose={handleRequirementsDialogClose}
+            requirements={selectedRequirements}
+          />
+        </>
+      )}
+
+      {activeTab === "findCandidates" && (
+        <>
+          <h1 className="text-2xl font-semibold mb-4">Find Candidates</h1>
+          <div className="flex justify-end">
+            <button className="bg-primary text-white py-2 px-4 rounded-lg mr-2">
+              loop
+            </button>
+            <button className="bg-primary text-white py-2 px-4 rounded-lg mr-2">
+              search
+            </button>
+          </div>
+          <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+            <thead>
+              <tr>
+                <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
+                  type
+                </th>
+                <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
+                  Name
+                </th>
+                <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
+                  Date
+                </th>
+                <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
+                  Options
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colSpan="4" className="text-center py-4">
+                  No candidates found.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </>
+      )}
     </div>
   );
 };

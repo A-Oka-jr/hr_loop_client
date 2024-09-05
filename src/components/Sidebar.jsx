@@ -37,7 +37,7 @@ const Sidebar = ({ onLogout }) => {
   };
 
   return (
-    <div className="bg-gradient-to-b from-black to-blue-500 text-white h-screen w-72 flex flex-col shadow-lg">
+    <div className="bg-gradient-to-b from-primary to-violet-950 text-white h-screen w-72 flex flex-col shadow-lg">
       <div className="text-3xl font-bold p-8">
         <Link to="/">Hr Loop</Link>
       </div>
