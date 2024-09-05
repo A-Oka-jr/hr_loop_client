@@ -10,37 +10,49 @@ const Jobs = () => {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [jobs, setJobs] = useState([]);
+  const [requests, setRequests] = useState([]);
+
+  // Pagination states for requests (candidates)
+  const [currentPage, setCurrentPage] = useState(1);
+  const requestsPerPage = 5;
 
   useEffect(() => {
-    const fetchJobs = async () => {
-      setError(false);
+    const fetchData = async () => {
       setLoading(true);
+      setError(false);
       try {
-        const response = await axios.get(
-          `/api/v1/jobs/get_by_company_id/${currentUser.user.company_id}`
-        );
-        const data = response.data.data;
-
-        if (data.success === false) {
-          setLoading(false);
-          setError(true);
-          console.log(data.message);
-          return;
+        if (activeTab === "postJob") {
+          const response = await axios.get(
+            `/api/v1/jobs/get_by_company_id/${currentUser.user.company_id}`
+          );
+          const data = response.data.data;
+          if (data.success === false) throw new Error(data.message);
+          setJobs(data);
+        } else if (activeTab === "findCandidates") {
+          const response = await axios.get(
+            `/api/v1/search/getSearchesByCompanyId/${currentUser.user.company_id}`
+          );
+          const data = response.data.data;
+          if (data.success === false) throw new Error(data.message);
+          setRequests(data);
         }
-        setLoading(false);
-        setError(false);
-        setJobs(data);
       } catch (error) {
-        setLoading(false);
         setError(true);
         console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    if (activeTab === "postJob") {
-      fetchJobs();
-    }
+    fetchData();
   }, [currentUser, activeTab]);
+
+  // Pagination logic for requests
+  const paginatedRequests = requests.slice(
+    (currentPage - 1) * requestsPerPage,
+    currentPage * requestsPerPage
+  );
+  const totalPages = Math.ceil(requests.length / requestsPerPage);
 
   return (
     <div className="overflow-x-auto">
@@ -80,7 +92,20 @@ const Jobs = () => {
         />
       )}
 
-      {activeTab === "findCandidates" && <FindCandidates />}
+      {activeTab === "findCandidates" && (
+        <FindCandidates
+          currentUser={currentUser}
+          setError={setError}
+          setLoading={setLoading}
+          requests={paginatedRequests}
+          setRequests={setRequests}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          setCurrentPage={setCurrentPage}
+          loading={loading}
+          error={error}
+        />
+      )}
     </div>
   );
 };

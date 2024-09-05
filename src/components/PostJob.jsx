@@ -132,12 +132,14 @@ const PostJob = ({
         </p>
       )}
 
-      <button
-        className="bg-primary text-white py-2 px-4 rounded-lg hover:bg-violet-950 mb-4"
-        onClick={handleAddJobClick}
-      >
-        Add Job
-      </button>
+      <div className="flex items-end justify-end">
+        <button
+          className="bg-primary text-white py-2 px-4 rounded-lg hover:bg-violet-950 mb-4"
+          onClick={handleAddJobClick}
+        >
+          Add Job
+        </button>
+      </div>
 
       <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
         <thead>
