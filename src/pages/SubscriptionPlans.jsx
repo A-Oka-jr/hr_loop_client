@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaGift, FaMedal, FaGem } from "react-icons/fa";
-import PaymentDialog from "../components/PaymentDialog";
-import CompanyDetailsDialog from "../components/CompanyDetailsDialog";
+import PaymentDialog from "../components/dialogs/PaymentDialog";
+import CompanyDetailsDialog from "../components/dialogs/CompanyDetailsDialog";
 import { useSelector, useDispatch } from "react-redux";
 import { updateUserRole } from "../redux/user/userSlice"; // Import your action to update the role
 
