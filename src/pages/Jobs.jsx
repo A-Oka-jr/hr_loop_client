@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import JobFormDialog from "../components/JobFormDialog";
-import RequirementsDialog from "../components/RequirementsDialog";
+import JobFormDialog from "../components/dialogs/JobFormDialog";
+import RequirementsDialog from "../components/dialogs/RequirementsDialog";
 import { AiFillDelete, AiFillEdit } from "react-icons/ai";
 import axios from "axios";
 
