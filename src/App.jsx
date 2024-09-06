@@ -7,6 +7,7 @@ import {
 import Dashboard from "./components/Dashboard";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
+import SeekerProfile from "./pages/SeekerProfile";
 import Settings from "./pages/Settings";
 import SubscriptionPlans from "./pages/SubscriptionPlans";
 import Login from "./pages/Login";
@@ -29,6 +30,7 @@ function App() {
         >
           <Route index element={<Home />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="seeker_profile" element={<SeekerProfile />} />
           <Route path="jobs" element={<Jobs />} />
           <Route path="settings" element={<Settings />} />
           <Route path="subscription_plans" element={<SubscriptionPlans />} />

@@ -3,8 +3,9 @@ import axios from "axios";
 import { FaGift, FaMedal, FaGem } from "react-icons/fa";
 import PaymentDialog from "../components/dialogs/PaymentDialog";
 import CompanyDetailsDialog from "../components/dialogs/CompanyDetailsDialog";
+import AddJobseekerDialog from "../components/dialogs/AddJobseekerDialog";
 import { useSelector, useDispatch } from "react-redux";
-import { updateUserRole } from "../redux/user/userSlice"; // Import your action to update the role
+import { updateUserRole } from "../redux/user/userSlice";
 
 const SubscriptionPlans = () => {
   const dispatch = useDispatch();
@@ -14,6 +15,7 @@ const SubscriptionPlans = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [isCompanyDialogOpen, setIsCompanyDialogOpen] = useState(false);
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
+  const [isJobseekerDialogOpen, setIsJobseekerDialogOpen] = useState(false);
   const [companyId, setCompanyId] = useState(null);
   const { currentUser } = useSelector((state) => state.user);
 
@@ -48,7 +50,9 @@ const SubscriptionPlans = () => {
 
   const handleChoosePlan = (plan) => {
     setSelectedPlan(plan);
-    if (plan.type === "premium" || plan.type === "professional") {
+    if (plan.type === "free") {
+      setIsJobseekerDialogOpen(true);
+    } else if (plan.type === "premium" || plan.type === "professional") {
       setIsCompanyDialogOpen(true);
     } else {
       processPlanSelection(plan.id);
@@ -78,7 +82,7 @@ const SubscriptionPlans = () => {
       );
 
       if (response.data.success) {
-        setCompanyId(response.data.company.id); // Store the company_id
+        setCompanyId(response.data.company.id);
         setIsCompanyDialogOpen(false);
         setIsPaymentDialogOpen(true);
       } else {
@@ -95,7 +99,7 @@ const SubscriptionPlans = () => {
   const handlePayment = async (paymentDetails) => {
     paymentDetails.company_id = companyId;
     paymentDetails.subscription_plan_id = selectedPlan.id;
-    paymentDetails.amount = selectedPlan.price; // Pass the plan amount
+    paymentDetails.amount = selectedPlan.price;
     paymentDetails.status = "success";
 
     try {
@@ -121,15 +125,51 @@ const SubscriptionPlans = () => {
       } else {
         console.error("Error processing payment:", response.data.message);
       }
-      setSelectedPlan(null); // Clear selection after successful payment
+      setSelectedPlan(null);
     } catch (error) {
       console.error("Error processing payment:", error);
+    }
+  };
+
+  const handleJobseekerSubmit = async (jobseekerData) => {
+    jobseekerData.user_id = currentUser.user.id;
+    console.log(jobseekerData);
+
+    try {
+      const response = await axios.post(
+        "/api/v1/jobSeekers/create",
+        jobseekerData
+      );
+
+      if (response.data.success) {
+        console.log("Jobseeker details submitted successfully!");
+        setIsJobseekerDialogOpen(false);
+        const newRole = "job_seeker";
+        dispatch(updateUserRole(newRole));
+
+        const updatedUser = {
+          ...currentUser.user,
+          role: newRole,
+        };
+        localStorage.setItem(
+          "currentUser",
+          JSON.stringify({ user: updatedUser })
+        );
+      } else {
+        console.error(
+          "Error submitting jobseeker details:",
+          response.data.message
+        );
+      }
+    } catch (error) {
+      console.error("Error submitting jobseeker details:", error);
     }
   };
 
   const handleCloseDialogs = () => {
     setIsCompanyDialogOpen(false);
     setIsPaymentDialogOpen(false);
+    setIsJobseekerDialogOpen(false);
   };
 
   return (
@@ -195,6 +235,13 @@ const SubscriptionPlans = () => {
         onClose={handleCloseDialogs}
         onConfirm={handlePayment}
         plan={selectedPlan}
+      />
+
+      {/* Add Jobseeker Dialog */}
+      <AddJobseekerDialog
+        isOpen={isJobseekerDialogOpen}
+        onClose={handleCloseDialogs}
+        onSubmit={handleJobseekerSubmit}
       />
     </div>
   );

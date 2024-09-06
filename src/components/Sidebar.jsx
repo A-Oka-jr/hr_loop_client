@@ -54,7 +54,7 @@ const Sidebar = ({ onLogout }) => {
               </Link>
             </li>
           )}
-          {currentUser?.user.role && (
+          {currentUser?.user.role === "company_user" && (
             <li className="mb-6">
               <Link
                 to="/profile"
@@ -65,7 +65,18 @@ const Sidebar = ({ onLogout }) => {
               </Link>
             </li>
           )}
-          {currentUser?.user.role && (
+          {currentUser?.user.role === "job_seeker" && (
+            <li className="mb-6">
+              <Link
+                to="/seeker_profile"
+                className="flex items-center space-x-4 p-3 text-lg hover:bg-white hover:bg-opacity-10 rounded-lg transition ease-in-out duration-300"
+              >
+                <FaUserCircle className="text-2xl" />
+                <span>Profile</span>
+              </Link>
+            </li>
+          )}
+          {currentUser?.user.role === "company_user" && (
             <li className="mb-6">
               <Link
                 to="/jobs"
