@@ -35,7 +35,7 @@ const RequirementsDialog = ({ isOpen, onClose, requirements }) => {
           <li className="flex items-start">
             <span className="font-semibold text-gray-700 w-32">Skills:</span>
             <span className="text-gray-600 ml-2">
-              {requirements.qualifications.skills}
+              {requirements.qualifications.skills.join(", ")}
             </span>
           </li>
           {/* Add more fields as needed */}

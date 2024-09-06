@@ -19,6 +19,8 @@ const JobFormDialog = ({ isOpen, onClose, onSubmit, initialData }) => {
     posted_date: "",
   });
 
+  const [skillInput, setSkillInput] = useState(""); // Track current skill input
+
   useEffect(() => {
     if (isOpen) {
       // Only update form data when the dialog is open
@@ -85,15 +87,37 @@ const JobFormDialog = ({ isOpen, onClose, onSubmit, initialData }) => {
     }));
   };
 
-  const handleSkillChange = (e) => {
-    const { value } = e.target;
+  const handleSkillInputChange = (e) => {
+    setSkillInput(e.target.value); // Update input state
+  };
+
+  const handleSkillKeyPress = (e) => {
+    if (e.key === "Enter" && skillInput.trim() !== "") {
+      e.preventDefault();
+      setFormData((prev) => ({
+        ...prev,
+        requirements: {
+          ...prev.requirements,
+          qualifications: {
+            ...prev.requirements.qualifications,
+            skills: [...prev.requirements.qualifications.skills, skillInput],
+          },
+        },
+      }));
+      setSkillInput(""); // Clear the input field
+    }
+  };
+
+  const removeSkill = (index) => {
     setFormData((prev) => ({
       ...prev,
       requirements: {
         ...prev.requirements,
         qualifications: {
           ...prev.requirements.qualifications,
-          skills: value.split(",").map((skill) => skill.trim()),
+          skills: prev.requirements.qualifications.skills.filter(
+            (_, i) => i !== index
+          ),
         },
       },
     }));
@@ -105,7 +129,6 @@ const JobFormDialog = ({ isOpen, onClose, onSubmit, initialData }) => {
   };
 
   const handleClose = () => {
-    // Clear form data when closing
     setFormData({
       title: "",
       description: "",
@@ -136,17 +159,53 @@ const JobFormDialog = ({ isOpen, onClose, onSubmit, initialData }) => {
       <div className="bg-white p-8 rounded-lg shadow-lg z-10 w-full max-w-lg">
         <h2 className="text-2xl font-bold mb-4">Job Form</h2>
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700">Title</label>
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              className="mt-1 p-2 border border-gray-300 rounded w-full"
-            />
+          <div className="flex flex-wrap gap-4">
+            <div className="flex-1">
+              <label className="block text-gray-700">Title</label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                className="mt-1 p-2 border border-gray-300 rounded w-full"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block text-gray-700">Position</label>
+              <input
+                type="text"
+                name="position"
+                value={formData.requirements.position}
+                onChange={handleRequirementChange}
+                className="mt-1 p-2 border border-gray-300 rounded w-full"
+              />
+            </div>
           </div>
-          <div className="mb-4">
+
+          <div className="flex flex-wrap gap-4 mt-4">
+            <div className="flex-1">
+              <label className="block text-gray-700">Education</label>
+              <input
+                type="text"
+                name="education"
+                value={formData.requirements.qualifications.education}
+                onChange={handleRequirementChange}
+                className="mt-1 p-2 border border-gray-300 rounded w-full"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block text-gray-700">Experience</label>
+              <input
+                type="text"
+                name="experience"
+                value={formData.requirements.qualifications.experience}
+                onChange={handleRequirementChange}
+                className="mt-1 p-2 border border-gray-300 rounded w-full"
+              />
+            </div>
+          </div>
+
+          <div className="mt-4">
             <label className="block text-gray-700">Description</label>
             <textarea
               name="description"
@@ -155,95 +214,99 @@ const JobFormDialog = ({ isOpen, onClose, onSubmit, initialData }) => {
               className="mt-1 p-2 border border-gray-300 rounded w-full"
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Position</label>
-            <input
-              type="text"
-              name="position"
-              value={formData.requirements.position}
-              onChange={handleRequirementChange}
-              className="mt-1 p-2 border border-gray-300 rounded w-full"
-            />
+
+          <div className="mt-4">
+            <label className="block text-gray-700">Skills</label>
+            <div className="flex items-center">
+              <input
+                type="text"
+                value={skillInput}
+                onChange={handleSkillInputChange}
+                onKeyPress={handleSkillKeyPress} // Detect Enter key
+                className="mt-1 p-2 border border-gray-300 rounded w-full"
+                placeholder="Type a skill and press Enter"
+              />
+            </div>
+            <div className="mt-2 max-h-40 overflow-y-auto">
+              {formData.requirements.qualifications.skills.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {formData.requirements.qualifications.skills.map(
+                    (skill, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-3 py-1 rounded-full bg-primary text-white"
+                      >
+                        {skill}
+                        <button
+                          onClick={() => removeSkill(index)}
+                          className="ml-2 text-white hover:bg-red-700 rounded-full p-1"
+                        >
+                          x
+                        </button>
+                      </span>
+                    )
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Education</label>
-            <input
-              type="text"
-              name="education"
-              value={formData.requirements.qualifications.education}
-              onChange={handleRequirementChange}
-              className="mt-1 p-2 border border-gray-300 rounded w-full"
-            />
+
+          <div className="flex flex-wrap gap-4 mt-4">
+            <div className="flex-1">
+              <label className="block text-gray-700">Location</label>
+              <input
+                type="text"
+                name="location"
+                value={formData.location}
+                onChange={handleChange}
+                className="mt-1 p-2 border border-gray-300 rounded w-full"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block text-gray-700">Type</label>
+              <select
+                name="type"
+                value={formData.type}
+                onChange={handleChange}
+                className="mt-1 p-2 border border-gray-300 rounded w-full"
+              >
+                <option value="">Select Type</option>
+                <option value="full-time">Full Time</option>
+                <option value="part-time">Part Time</option>
+                <option value="remote">Remote</option>
+                <option value="internship">Internship</option>
+                <option value="contract">Contract</option>
+              </select>
+            </div>
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Experience</label>
-            <input
-              type="text"
-              name="experience"
-              value={formData.requirements.qualifications.experience}
-              onChange={handleRequirementChange}
-              className="mt-1 p-2 border border-gray-300 rounded w-full"
-            />
+
+          <div className="flex flex-wrap gap-4 mt-4">
+            <div className="flex-1">
+              <label className="block text-gray-700">Posted Date</label>
+              <input
+                type="date"
+                name="posted_date"
+                value={formData.posted_date.split("T")[0]} // Format date input
+                onChange={handleChange}
+                className="mt-1 p-2 border border-gray-300 rounded w-full"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block text-gray-700">Status</label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="mt-1 p-2 border border-gray-300 rounded w-full"
+              >
+                <option value="">Select Status</option>
+                <option value="opened">Opened</option>
+                <option value="closed">Closed</option>
+              </select>
+            </div>
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">
-              Skills (comma-separated)
-            </label>
-            <input
-              type="text"
-              value={formData.requirements.qualifications.skills.join(", ")}
-              onChange={handleSkillChange}
-              className="mt-1 p-2 border border-gray-300 rounded w-full"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Location</label>
-            <input
-              type="text"
-              name="location"
-              value={formData.location}
-              onChange={handleChange}
-              className="mt-1 p-2 border border-gray-300 rounded w-full"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Type</label>
-            <select
-              name="type"
-              value={formData.type}
-              onChange={handleChange}
-              className="mt-1 p-2 border border-gray-300 rounded w-full"
-            >
-              <option value="">Select type</option>
-              <option value="full-time">Full Time</option>
-              <option value="part-time">Part Time</option>
-              <option value="remote">Remote</option>
-            </select>
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Posted Date</label>
-            <input
-              type="date"
-              name="posted_date"
-              value={formData.posted_date.split("T")[0]} // Format date input
-              onChange={handleChange}
-              className="mt-1 p-2 border border-gray-300 rounded w-full"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Status</label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="mt-1 p-2 border border-gray-300 rounded w-full"
-            >
-              <option value="">Select status</option>
-              <option value="opened">Opened</option>
-              <option value="closed">Closed</option>
-            </select>
-          </div>
-          <div className="flex justify-end">
+
+          <div className="flex justify-end mt-6">
             <button
               type="button"
               onClick={handleClose}
@@ -263,7 +326,6 @@ const JobFormDialog = ({ isOpen, onClose, onSubmit, initialData }) => {
     </div>
   );
 };
-
 JobFormDialog.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,

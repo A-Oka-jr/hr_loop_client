@@ -194,9 +194,9 @@ const PostJob = ({
               <td className="py-3 px-6 border-b border-gray-200">
                 {job.type === "full-time"
                   ? "Full Time"
-                  : job.type === "parttime"
+                  : job.type === "part-time"
                   ? "Part Time"
-                  : "Remote"}
+                  : job.type}
               </td>
               <td className="py-3 px-6 border-b border-gray-200">
                 {new Date(job.posted_date).toLocaleDateString()}
@@ -279,7 +279,13 @@ PostJob.propTypes = {
         position: PropTypes.string.isRequired,
       }).isRequired,
       location: PropTypes.string.isRequired,
-      type: PropTypes.oneOf(["full-time", "part-time", "remote"]).isRequired,
+      type: PropTypes.oneOf([
+        "full-time",
+        "part-time",
+        "remote",
+        "internship",
+        "contract",
+      ]).isRequired,
       posted_date: PropTypes.string.isRequired,
       status: PropTypes.oneOf(["opened", "closed"]).isRequired,
     })
