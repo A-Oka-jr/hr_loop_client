@@ -33,7 +33,7 @@ const Dashboard = () => {
     <div className="flex h-screen">
       <Sidebar onLogout={handleLogout} />
       <div className="flex-1 bg-gray-50 p-10 overflow-y-auto">
-        <div className="bg-white shadow-lg rounded-lg p-8">
+        <div className="bg-white shadow-md rounded-lg p-8">
           <Outlet />
         </div>
       </div>
