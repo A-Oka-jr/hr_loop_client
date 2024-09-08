@@ -76,16 +76,23 @@ const SeekerProfile = () => {
     setEditingExperienceIndex(null);
   };
 
-  const deleteExperience = async (index) => {
+  const deleteExperience = async (description, index) => {
+    const updatedUser = { ...user };
+    updatedUser.experience.jobs.splice(index, 1);
+    // console.log(description, "index:", index);
+    console.log(updatedUser.experience);
+
+    // return;
     try {
-      await axios.delete(
-        `api/v1/jobSeekers/deleteExperience/${currentUser.user.job_seeker_id}/${index}`
+      await axios.put(
+        `api/v1/jobSeekers/update/${updatedUser.id}`,
+        updatedUser
       ); // Replace with the actual API endpoint
-      const updatedUser = { ...user };
-      updatedUser.experience.jobs.splice(index, 1);
+
       setUser(updatedUser);
     } catch (error) {
       setError("Failed to delete experience");
+      console.error(error);
     }
   };
 
@@ -212,7 +219,9 @@ const SeekerProfile = () => {
                         className="text-green-600 text-2xl hover:text-green-800 mr-2 cursor-pointer"
                       />
                       <AiFillDelete
-                        // onClick={() => deleteExperience(index)}
+                        onClick={() =>
+                          deleteExperience(user.experience.jobs, index)
+                        }
                         title="Delete Experience"
                         className="text-red-600 text-2xl hover:text-red-800 cursor-pointer"
                       />

@@ -1,4 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
+import PropTypes from "prop-types";
+
 import axios from "axios"; // Import axios for making HTTP requests
 
 const EditProfileDialog = ({ isOpen, onClose, user }) => {
@@ -53,6 +55,7 @@ const EditProfileDialog = ({ isOpen, onClose, user }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(formData);
 
     const formDataToSubmit = new FormData();
     // Append form data
@@ -274,6 +277,24 @@ const EditProfileDialog = ({ isOpen, onClose, user }) => {
       </div>
     </div>
   );
+};
+
+EditProfileDialog.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  user: PropTypes.shape({
+    profile_details: PropTypes.shape({
+      first_name: PropTypes.string,
+      last_name: PropTypes.string,
+      role: PropTypes.string,
+      bio: PropTypes.string,
+    }),
+    education: PropTypes.string,
+    skills: PropTypes.arrayOf(PropTypes.string),
+    address: PropTypes.string,
+    resume_link: PropTypes.string,
+    resume_file: PropTypes.string,
+  }).isRequired,
 };
 
 export default EditProfileDialog;
