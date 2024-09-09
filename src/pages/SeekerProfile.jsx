@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import EditProfileDialog from "../components/dialogs/EditProfileDialog";
 import { useSelector } from "react-redux";
-import { AiFillDelete, AiFillEdit } from "react-icons/ai";
+import { AiFillDelete, AiFillEdit, AiFillPlusCircle } from "react-icons/ai";
 
 const SeekerProfile = () => {
   const [user, setUser] = useState(null);
@@ -10,6 +10,7 @@ const SeekerProfile = () => {
   const [error, setError] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingExperienceIndex, setEditingExperienceIndex] = useState(null);
+  const [isAdding, setIsAdding] = useState(false); // State for adding a new experience
 
   const { currentUser } = useSelector((state) => state.user);
   const [newExperience, setNewExperience] = useState({
@@ -21,16 +22,16 @@ const SeekerProfile = () => {
   });
 
   useEffect(() => {
-    // Fetch user data from API
     const fetchUserData = async () => {
       try {
         const response = await axios.get(
           `api/v1/jobSeekers/getByUserId/${currentUser.user.job_seeker_id}`
-        ); // Replace with the actual API endpoint
-        setUser(response.data.data); // Update to use response.data.data
+        );
+        setUser(response.data.data);
         setLoading(false);
       } catch (error) {
-        setError("Failed to fetch Your data");
+        console.error(error);
+        setError("Failed to fetch your data");
         setLoading(false);
       }
     };
@@ -38,7 +39,6 @@ const SeekerProfile = () => {
     fetchUserData();
   }, [currentUser.user.job_seeker_id]);
 
-  // Function to format the date
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long" };
     return new Date(dateString).toLocaleDateString(undefined, options);
@@ -59,41 +59,80 @@ const SeekerProfile = () => {
 
   const saveExperience = async () => {
     try {
-      await axios.put(
-        `api/v1/jobSeekers/update/${currentUser.user.job_seeker_id}`,
-        { index: editingExperienceIndex, ...newExperience }
-      ); // Replace with the actual API endpoint
-      const updatedUser = { ...user };
-      updatedUser.experience.jobs[editingExperienceIndex] = newExperience;
-      setUser(updatedUser);
+      if (isAdding) {
+        // If adding a new experience
+        const updatedUser = { ...user };
+        updatedUser.experience.jobs.push(newExperience);
+
+        await axios.post(
+          `api/v1/jobSeekers/addExperience/${currentUser.user.job_seeker_id}`,
+          newExperience
+        );
+
+        setUser(updatedUser);
+        setIsAdding(false);
+      } else {
+        // If editing an existing experience
+        await axios.patch(
+          `api/v1/jobSeekers/updateExperience/${currentUser.user.job_seeker_id}`,
+          { index: editingExperienceIndex, experience: newExperience }
+        );
+
+        const updatedUser = { ...user };
+        updatedUser.experience.jobs[editingExperienceIndex] = newExperience;
+        setUser(updatedUser);
+      }
+
       setEditingExperienceIndex(null);
+      setNewExperience({
+        role: "",
+        company: "",
+        start_date: "",
+        end_date: "",
+        description: "",
+      });
     } catch (error) {
-      setError("Failed to update experience");
+      console.error(error);
+      setError("Failed to save experience");
     }
   };
 
   const cancelEditing = () => {
     setEditingExperienceIndex(null);
+    setIsAdding(false); // Cancel adding mode
   };
 
-  const deleteExperience = async (description, index) => {
+  const deleteExperience = async (index) => {
     const updatedUser = { ...user };
     updatedUser.experience.jobs.splice(index, 1);
-    // console.log(description, "index:", index);
-    console.log(updatedUser.experience);
 
-    // return;
     try {
       await axios.put(
         `api/v1/jobSeekers/update/${updatedUser.id}`,
         updatedUser
-      ); // Replace with the actual API endpoint
+      );
 
       setUser(updatedUser);
     } catch (error) {
-      setError("Failed to delete experience");
       console.error(error);
+      alert("Failed to delete experience");
+      setError("Failed to delete experience");
     }
+  };
+
+  const startAdding = () => {
+    setIsAdding(true);
+    setNewExperience({
+      role: "",
+      company: "",
+      start_date: "",
+      end_date: "",
+      description: "",
+    });
+  };
+
+  const handleProfileUpdate = (updatedProfile) => {
+    setUser(updatedProfile);
   };
 
   if (loading) {
@@ -107,7 +146,6 @@ const SeekerProfile = () => {
   if (!user) {
     return <div>No user data available</div>;
   }
-
   return (
     <div className="max-w-full mx-auto bg-white rounded-lg overflow-hidden">
       <div className="p-6">
@@ -219,9 +257,7 @@ const SeekerProfile = () => {
                         className="text-green-600 text-2xl hover:text-green-800 mr-2 cursor-pointer"
                       />
                       <AiFillDelete
-                        onClick={() =>
-                          deleteExperience(user.experience.jobs, index)
-                        }
+                        onClick={() => deleteExperience(index)}
                         title="Delete Experience"
                         className="text-red-600 text-2xl hover:text-red-800 cursor-pointer"
                       />
@@ -230,6 +266,67 @@ const SeekerProfile = () => {
                 )}
               </div>
             ))}
+
+            {/* Add New Experience Form */}
+            {isAdding && (
+              <div className="mt-4">
+                <input
+                  type="text"
+                  name="role"
+                  value={newExperience.role}
+                  onChange={handleChange}
+                  className="block mb-2 border border-gray-300 rounded p-2"
+                  placeholder="Role"
+                />
+                <input
+                  type="text"
+                  name="company"
+                  value={newExperience.company}
+                  onChange={handleChange}
+                  className="block mb-2 border border-gray-300 rounded p-2"
+                  placeholder="Company"
+                />
+                <input
+                  type="date"
+                  name="start_date"
+                  value={newExperience.start_date}
+                  onChange={handleChange}
+                  className="block mb-2 border border-gray-300 rounded p-2"
+                />
+                <input
+                  type="date"
+                  name="end_date"
+                  value={newExperience.end_date}
+                  onChange={handleChange}
+                  className="block mb-2 border border-gray-300 rounded p-2"
+                />
+                <textarea
+                  name="description"
+                  value={newExperience.description}
+                  onChange={handleChange}
+                  className="block mb-2 border border-gray-300 rounded p-2"
+                  placeholder="Description"
+                  rows="4"
+                ></textarea>
+                <button
+                  onClick={saveExperience}
+                  className="bg-blue-500 text-white py-2 px-4 rounded mr-2"
+                >
+                  Add Experience
+                </button>
+                <button
+                  onClick={cancelEditing}
+                  className="bg-gray-500 text-white py-2 px-4 rounded"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+
+            <AiFillPlusCircle
+              onClick={startAdding}
+              className="mt-4   text-primary text-2xl hover:text-primary-800 cursor-pointer"
+            />
           </div>
           <div>
             <h3 className="text-lg font-semibold text-gray-800 mt-6">
@@ -337,6 +434,11 @@ const SeekerProfile = () => {
         isOpen={isDialogOpen}
         onClose={closeDialog}
         user={user}
+        onProfileUpdate={handleProfileUpdate}
+        setError={setError}
+        error={error}
+        setLoading={setLoading}
+        loading={loading}
       />
     </div>
   );

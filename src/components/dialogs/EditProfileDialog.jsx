@@ -1,12 +1,25 @@
 import { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
-
 import axios from "axios"; // Import axios for making HTTP requests
 
-const EditProfileDialog = ({ isOpen, onClose, user }) => {
+const EditProfileDialog = ({
+  isOpen,
+  onClose,
+  user,
+  onProfileUpdate,
+  setError,
+  error,
+  setLoading,
+  loading,
+}) => {
   const [formData, setFormData] = useState({
-    ...user.profile_details,
-    role: user.profile_details?.role || "",
+    profile_details: {
+      first_name: user.profile_details?.first_name || "",
+      last_name: user.profile_details?.last_name || "",
+      role: user.profile_details?.role || "",
+      bio: user.profile_details?.bio || "",
+      age: user.profile_details?.age || "", // Adding age
+    },
     education: user.education || "",
     skills: user.skills || [], // Ensure skills are an array
     address: user.address || "",
@@ -20,7 +33,24 @@ const EditProfileDialog = ({ isOpen, onClose, user }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+
+    if (
+      name === "first_name" ||
+      name === "last_name" ||
+      name === "role" ||
+      name === "bio" ||
+      name === "age"
+    ) {
+      setFormData({
+        ...formData,
+        profile_details: {
+          ...formData.profile_details,
+          [name]: value,
+        },
+      });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSkillChange = (e) => {
@@ -55,9 +85,15 @@ const EditProfileDialog = ({ isOpen, onClose, user }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
 
     const formDataToSubmit = new FormData();
+    Object.keys(formData.profile_details).forEach((key) => {
+      formDataToSubmit.append(
+        `profile_details[${key}]`,
+        formData.profile_details[key]
+      );
+    });
+
     // Append form data
     for (const key in formData) {
       if (Array.isArray(formData[key])) {
@@ -73,9 +109,18 @@ const EditProfileDialog = ({ isOpen, onClose, user }) => {
       formDataToSubmit.append("resume_file", resumeFile);
     }
 
+    for (const [key, value] of formDataToSubmit.entries()) {
+      console.log(`${key}: ${value}`);
+    }
+
+    // TODO: fix updating profile_details
+    console.log("Profile Details:", formData);
+    setError(null);
+
+    setLoading(true);
     try {
       // Make an API call to update the user profile
-      await axios.put(
+      const response = await axios.put(
         "api/v1/jobSeekers/update/e584521d-faac-433b-b15d-a3f4e8b7427d",
         formDataToSubmit,
         {
@@ -84,10 +129,21 @@ const EditProfileDialog = ({ isOpen, onClose, user }) => {
           },
         }
       );
+      const data = response.data;
+      if (data.success === false) {
+        setLoading(false);
+        setError("Failed to update profile");
+        console.error(data.message);
+        return;
+      }
       alert("Profile updated successfully!");
-      window.location.reload();
+      setLoading(false);
+      setError(null);
+      onProfileUpdate(data.data);
       onClose(); // Close the dialog on successful submit
     } catch (error) {
+      setLoading(false);
+      setError("Failed to update profile");
       console.error("Error updating profile:", error);
       alert("Failed to update profile");
     }
@@ -109,6 +165,14 @@ const EditProfileDialog = ({ isOpen, onClose, user }) => {
   }, [isOpen]);
 
   if (!isOpen) return null;
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div
@@ -126,7 +190,7 @@ const EditProfileDialog = ({ isOpen, onClose, user }) => {
                 type="text"
                 id="first_name"
                 name="first_name"
-                value={formData.first_name}
+                value={formData.profile_details.first_name}
                 onChange={handleChange}
                 className="w-full border border-gray-300 rounded-md p-2"
               />
@@ -139,7 +203,7 @@ const EditProfileDialog = ({ isOpen, onClose, user }) => {
                 type="text"
                 id="last_name"
                 name="last_name"
-                value={formData.last_name}
+                value={formData.profile_details.last_name}
                 onChange={handleChange}
                 className="w-full border border-gray-300 rounded-md p-2"
               />
@@ -153,7 +217,7 @@ const EditProfileDialog = ({ isOpen, onClose, user }) => {
               type="text"
               id="role"
               name="role"
-              value={formData.role}
+              value={formData.profile_details.role}
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-md p-2"
             />
@@ -165,7 +229,20 @@ const EditProfileDialog = ({ isOpen, onClose, user }) => {
             <textarea
               id="bio"
               name="bio"
-              value={formData.bio}
+              value={formData.profile_details.bio}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-md p-2"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 mb-1" htmlFor="age">
+              Age
+            </label>
+            <input
+              type="number"
+              id="age"
+              name="age"
+              value={formData.profile_details.age}
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-md p-2"
             />
@@ -282,12 +359,18 @@ const EditProfileDialog = ({ isOpen, onClose, user }) => {
 EditProfileDialog.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
+  onProfileUpdate: PropTypes.func.isRequired,
+  setError: PropTypes.func.isRequired,
+  setLoading: PropTypes.func.isRequired,
+  error: PropTypes.string.isRequired,
+  loading: PropTypes.bool.isRequired,
   user: PropTypes.shape({
     profile_details: PropTypes.shape({
       first_name: PropTypes.string,
       last_name: PropTypes.string,
       role: PropTypes.string,
       bio: PropTypes.string,
+      age: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), // Allow age as string or number
     }),
     education: PropTypes.string,
     skills: PropTypes.arrayOf(PropTypes.string),
