@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import EditProfileDialog from "../components/dialogs/EditProfileDialog";
 import { useSelector } from "react-redux";
-import { AiFillDelete, AiFillEdit, AiFillPlusCircle } from "react-icons/ai";
+import {
+  AiOutlineDelete,
+  AiOutlineEdit,
+  AiOutlinePlusCircle,
+} from "react-icons/ai";
+import EducationSection from "../components/sections/EducationSection";
 
 const SeekerProfile = () => {
   const [user, setUser] = useState(null);
@@ -242,7 +247,7 @@ const SeekerProfile = () => {
                     </button>
                   </div>
                 ) : (
-                  <div>
+                  <div className="p-4 border border-gray-300 rounded">
                     <h4 className="text-md font-semibold text-gray-800">
                       {job.role} at {job.company}
                     </h4>
@@ -251,12 +256,12 @@ const SeekerProfile = () => {
                     </p>
                     <p className="text-gray-700">{job.description}</p>
                     <div className="flex mt-2">
-                      <AiFillEdit
+                      <AiOutlineEdit
                         onClick={() => startEditing(index)}
                         title="Edit Experience"
                         className="text-green-600 text-2xl hover:text-green-800 mr-2 cursor-pointer"
                       />
-                      <AiFillDelete
+                      <AiOutlineDelete
                         onClick={() => deleteExperience(index)}
                         title="Delete Experience"
                         className="text-red-600 text-2xl hover:text-red-800 cursor-pointer"
@@ -323,24 +328,20 @@ const SeekerProfile = () => {
               </div>
             )}
 
-            <AiFillPlusCircle
+            <AiOutlinePlusCircle
+              title="Add Experience"
               onClick={startAdding}
               className="mt-4   text-primary text-2xl hover:text-primary-800 cursor-pointer"
             />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-800 mt-6">
-              Education
-            </h3>
-            <div className="mt-2">
-              <h4 className="text-md font-semibold text-gray-800">
-                {user.education}
-              </h4>
-              <p className="text-gray-600">
-                {/* {formatDate(education.start_date)} -{" "} */}
-                {/* {formatDate(education.end_date)} */}
-              </p>
-            </div>
+            <EducationSection
+              user={user}
+              education={user.education}
+              jobSeekerId={currentUser.user.job_seeker_id}
+              updateUser={setUser}
+            />
+
             <h3 className="text-lg font-semibold text-gray-800 mt-6">
               Address
             </h3>

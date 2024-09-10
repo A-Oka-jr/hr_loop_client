@@ -145,11 +145,13 @@ const SubscriptionPlans = () => {
         console.log("Jobseeker details submitted successfully!");
         setIsJobseekerDialogOpen(false);
         const newRole = "job_seeker";
-        dispatch(updateUserRole(newRole));
+        const jobSeeker = response.data.jobSeeker;
+        dispatch(updateUserRole(newRole, jobSeeker));
 
         const updatedUser = {
           ...currentUser.user,
           role: newRole,
+          job_seeker_id: jobSeeker,
         };
         localStorage.setItem(
           "currentUser",

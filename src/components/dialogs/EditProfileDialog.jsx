@@ -20,7 +20,7 @@ const EditProfileDialog = ({
       bio: user.profile_details?.bio || "",
       age: user.profile_details?.age || "", // Adding age
     },
-    education: user.education || "",
+    // education: user.education || "",
     skills: user.skills || [], // Ensure skills are an array
     address: user.address || "",
     resume_link: user.resume_link || "",
@@ -116,12 +116,12 @@ const EditProfileDialog = ({
     // TODO: fix updating profile_details
     console.log("Profile Details:", formData);
     setError(null);
-
     setLoading(true);
+
     try {
       // Make an API call to update the user profile
       const response = await axios.put(
-        "api/v1/jobSeekers/update/e584521d-faac-433b-b15d-a3f4e8b7427d",
+        `api/v1/jobSeekers/update/${user.id}`,
         formDataToSubmit,
         {
           headers: {
@@ -136,6 +136,8 @@ const EditProfileDialog = ({
         console.error(data.message);
         return;
       }
+      console.log(data);
+
       alert("Profile updated successfully!");
       setLoading(false);
       setError(null);
@@ -208,6 +210,20 @@ const EditProfileDialog = ({
                 className="w-full border border-gray-300 rounded-md p-2"
               />
             </div>
+
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-1" htmlFor="age">
+                Age
+              </label>
+              <input
+                type="number"
+                id="age"
+                name="age"
+                value={formData.profile_details.age}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded-md p-2"
+              />
+            </div>
           </div>
           <div className="mb-4">
             <label className="block text-gray-700 mb-1" htmlFor="role">
@@ -234,33 +250,8 @@ const EditProfileDialog = ({
               className="w-full border border-gray-300 rounded-md p-2"
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-1" htmlFor="age">
-              Age
-            </label>
-            <input
-              type="number"
-              id="age"
-              name="age"
-              value={formData.profile_details.age}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-md p-2"
-            />
-          </div>
+
           <div className="mb-4 flex space-x-4">
-            <div className="flex-1">
-              <label className="block text-gray-700 mb-1" htmlFor="education">
-                Education
-              </label>
-              <input
-                type="text"
-                id="education"
-                name="education"
-                value={formData.education}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md p-2"
-              />
-            </div>
             <div className="flex-1">
               <label className="block text-gray-700 mb-1" htmlFor="address">
                 Address
@@ -320,14 +311,14 @@ const EditProfileDialog = ({
                   {formData.skills.map((skill, index) => (
                     <span
                       key={index}
-                      className="inline-flex items-center px-3 py-1 rounded-full bg-primary text-white"
+                      className="bg-white text-primary border border-primary px-3 py-1 rounded-md flex items-center"
                     >
                       {skill}
                       <button
                         onClick={() => handleRemoveSkill(skill)}
-                        className="ml-2 text-white hover:bg-red-700 rounded-full p-1"
+                        className="ml-2 text-primary rounded-full p-1"
                       >
-                        x
+                        &times;
                       </button>
                     </span>
                   ))}
@@ -362,7 +353,7 @@ EditProfileDialog.propTypes = {
   onProfileUpdate: PropTypes.func.isRequired,
   setError: PropTypes.func.isRequired,
   setLoading: PropTypes.func.isRequired,
-  error: PropTypes.string.isRequired,
+  error: PropTypes.string,
   loading: PropTypes.bool.isRequired,
   user: PropTypes.shape({
     profile_details: PropTypes.shape({
@@ -372,7 +363,7 @@ EditProfileDialog.propTypes = {
       bio: PropTypes.string,
       age: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), // Allow age as string or number
     }),
-    education: PropTypes.string,
+    // education: PropTypes.string,
     skills: PropTypes.arrayOf(PropTypes.string),
     address: PropTypes.string,
     resume_link: PropTypes.string,
