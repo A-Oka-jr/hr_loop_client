@@ -172,6 +172,12 @@ const SeekerProfile = () => {
         <div className="text-center mt-2">
           <p className="text-gray-700">{user.profile_details.bio}</p>
         </div>
+        <div className="text-center mt-2">
+          <h3 className="text-lg font-semibold text-gray-800 mt-6">Address</h3>
+          <p className="text-gray-700">
+            {user.address || "Address not available"}
+          </p>
+        </div>
         <div className="mt-4">
           <h3 className="text-lg text-center font-semibold text-gray-800">
             Skills
@@ -180,13 +186,14 @@ const SeekerProfile = () => {
             {user.skills.map((skill) => (
               <span
                 key={skill}
-                className="m-2 bg-primary text-white py-1 px-3 rounded-full"
+                className="m-2  text-primary border border-primary px-3 py-1 rounded-md flex items-center"
               >
                 {skill}
               </span>
             ))}
           </div>
         </div>
+
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <h3 className="text-lg font-semibold text-gray-800">Experience</h3>
@@ -341,13 +348,8 @@ const SeekerProfile = () => {
               jobSeekerId={currentUser.user.job_seeker_id}
               updateUser={setUser}
             />
-
-            <h3 className="text-lg font-semibold text-gray-800 mt-6">
-              Address
-            </h3>
-            <p className="text-gray-700">
-              {user.address || "Address not available"}
-            </p>
+          </div>
+          <div className="mt-6">
             <h3 className="text-lg font-semibold text-gray-800 mt-6">Resume</h3>
             <a
               href={user.resume_file || "#"}

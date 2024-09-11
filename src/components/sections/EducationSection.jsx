@@ -36,9 +36,10 @@ const EducationSection = ({ user, education, jobSeekerId, updateUser }) => {
 
         updateUser({ ...user, education: updatedEducation });
         setEditingEducationIndex(null);
+        setIsAddingEducation(false);
       } else {
         await axios.post(
-          `api/v1/jobSeekers/addEducation/${user.id}`,
+          `api/v1/jobSeekers/addEducation/${jobSeekerId}`,
           newEducation
         );
 
