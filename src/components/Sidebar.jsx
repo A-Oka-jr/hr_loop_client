@@ -77,6 +77,18 @@ const Sidebar = ({ onLogout }) => {
               </Link>
             </li>
           )}
+
+          {currentUser?.user.role === "job_seeker" && (
+            <li className="mb-6">
+              <Link
+                to="/jobSeekerJobs"
+                className="flex items-center space-x-4 p-3 text-lg hover:bg-white hover:bg-opacity-10 rounded-lg transition ease-in-out duration-300"
+              >
+                <FaUserCircle className="text-2xl" />
+                <span>Jops</span>
+              </Link>
+            </li>
+          )}
           {currentUser?.user.role === "company_user" && (
             <li className="mb-6">
               <Link
@@ -100,17 +112,18 @@ const Sidebar = ({ onLogout }) => {
             </li>
           )}
 
-          {currentUser?.user.role === null && (
-            <li className="mb-6">
-              <Link
-                to="/subscription_plans"
-                className="flex items-center space-x-4 p-3 text-lg hover:bg-white hover:bg-opacity-10 rounded-lg transition ease-in-out duration-300"
-              >
-                <FaGem className="text-2xl" />
-                <span>Subscription Plans</span>
-              </Link>
-            </li>
-          )}
+          {currentUser?.user.role === null ||
+            (currentUser?.user.role === "company_user" && (
+              <li className="mb-6">
+                <Link
+                  to="/subscription_plans"
+                  className="flex items-center space-x-4 p-3 text-lg hover:bg-white hover:bg-opacity-10 rounded-lg transition ease-in-out duration-300"
+                >
+                  <FaGem className="text-2xl" />
+                  <span>Subscription Plans</span>
+                </Link>
+              </li>
+            ))}
         </ul>
       </nav>
       <div className="p-4">
