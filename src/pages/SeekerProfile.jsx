@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import EditProfileDialog from "../components/dialogs/EditProfileDialog";
 import { useSelector } from "react-redux";
@@ -11,13 +11,12 @@ import EducationSection from "../components/sections/EducationSection";
 
 const SeekerProfile = () => {
   const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingExperienceIndex, setEditingExperienceIndex] = useState(null);
-  const [isAdding, setIsAdding] = useState(false); // State for adding a new experience
-
-  const { currentUser } = useSelector((state) => state.user);
+  const [isAdding, setIsAdding] = useState(false);
   const [newExperience, setNewExperience] = useState({
     role: "",
     company: "",
@@ -25,6 +24,11 @@ const SeekerProfile = () => {
     end_date: "",
     description: "",
   });
+  const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false);
+  const [newPhoto, setNewPhoto] = useState(null);
+  const fileInputRef = useRef(null);
+
+  const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -41,6 +45,21 @@ const SeekerProfile = () => {
       }
     };
 
+    const getUserData = async () => {
+      try {
+        const response = await axios.get(
+          `api/v1/users/${currentUser.user.job_seeker_id}`
+        );
+        setProfile(response.data.data);
+        setLoading(false);
+      } catch (error) {
+        console.error(error);
+        setError("Failed to fetch your data");
+        setLoading(false);
+      }
+    };
+
+    getUserData();
     fetchUserData();
   }, [currentUser.user.job_seeker_id]);
 
@@ -65,7 +84,6 @@ const SeekerProfile = () => {
   const saveExperience = async () => {
     try {
       if (isAdding) {
-        // If adding a new experience
         const updatedUser = { ...user };
         updatedUser.experience.jobs.push(newExperience);
 
@@ -77,7 +95,6 @@ const SeekerProfile = () => {
         setUser(updatedUser);
         setIsAdding(false);
       } else {
-        // If editing an existing experience
         await axios.patch(
           `api/v1/jobSeekers/updateExperience/${currentUser.user.job_seeker_id}`,
           { index: editingExperienceIndex, experience: newExperience }
@@ -104,7 +121,7 @@ const SeekerProfile = () => {
 
   const cancelEditing = () => {
     setEditingExperienceIndex(null);
-    setIsAdding(false); // Cancel adding mode
+    setIsAdding(false);
   };
 
   const deleteExperience = async (index) => {
@@ -140,6 +157,44 @@ const SeekerProfile = () => {
     setUser(updatedProfile);
   };
 
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setNewPhoto(file);
+      handlePhotoUpload(file);
+    }
+  };
+
+  const handlePhotoUpload = async (file) => {
+    const formData = new FormData();
+    formData.append("profile_photo", file);
+
+    try {
+      await axios.post(
+        `api/v1/jobSeekers/updatePhoto/${currentUser.user.job_seeker_id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      const response = await axios.get(
+        `api/v1/jobSeekers/getByUserId/${currentUser.user.job_seeker_id}`
+      );
+      setUser(response.data.data);
+      setNewPhoto(null);
+    } catch (error) {
+      console.error(error);
+      setError("Failed to update profile photo");
+    }
+  };
+
+  const handleImageClick = () => {
+    fileInputRef.current.click();
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -151,14 +206,26 @@ const SeekerProfile = () => {
   if (!user) {
     return <div>No user data available</div>;
   }
+
   return (
     <div className="max-w-full mx-auto bg-white rounded-lg overflow-hidden">
       <div className="p-6">
-        <div className="flex justify-center">
+        <div className="flex justify-center  items-center">
           <img
-            className="w-32 h-32 object-cover rounded-full border-4 border-white"
-            src="https://randomuser.me/api/portraits/men/75.jpg"
+            className="w-32 h-32 object-center rounded-full border-4 border-white cursor-pointer"
+            src={
+              `http://localhost:3000/uploads/${profile.photo}`
+              //  || "https://randomuser.me/api/portraits/men/75.jpg"
+            }
             alt="Profile"
+            onClick={handleImageClick}
+          />
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            accept="image/*"
+            onChange={handleFileChange}
           />
         </div>
         <div className="text-center mt-2">
