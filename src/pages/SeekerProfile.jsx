@@ -170,7 +170,7 @@ const SeekerProfile = () => {
 
     try {
       await axios.post(
-        `api/v1/jobSeekers/updatePhoto/${currentUser.user.job_seeker_id}`,
+        `api/v1/users/updatePhoto/${currentUser.user.id}`,
         formData,
         {
           headers: {
@@ -180,7 +180,7 @@ const SeekerProfile = () => {
       );
 
       const response = await axios.get(
-        `api/v1/jobSeekers/getByUserId/${currentUser.user.job_seeker_id}`
+        `api/v1/jobSeekers/getByUserId/${currentUser.user.id}`
       );
       setUser(response.data.data);
       setNewPhoto(null);
@@ -418,8 +418,8 @@ const SeekerProfile = () => {
           <div className="mt-6">
             <h3 className="text-lg font-semibold text-gray-800 mt-6">Resume</h3>
             <a
-              href={user.resume_file || "#"}
-              download={user.resume_file || "resume.pdf"}
+              // href={`http://localhost:3000/uploads/${user.resume_file}`}
+              download={`http://localhost:3000/uploads/${user.resume_file}`}
               className="text-blue-600 hover:underline"
             >
               Download Resume
