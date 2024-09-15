@@ -2,8 +2,9 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 import JobFormDialog from "../components/dialogs/JobFormDialog";
 import RequirementsDialog from "../components/dialogs/RequirementsDialog";
-import { AiFillDelete, AiFillEdit } from "react-icons/ai";
+import { AiFillDelete, AiFillEdit, AiFillFolderOpen } from "react-icons/ai";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const PostJob = ({
   currentUser,
@@ -221,6 +222,10 @@ const PostJob = ({
                   >
                     Delete
                   </AiFillDelete>
+
+                  <Link className="mr-2" to={`/jobs/${job.id}`}>
+                    <AiFillFolderOpen className="text-primary text-xl hover:text-violet-950" />
+                  </Link>
                 </div>
               </td>
             </tr>

@@ -12,6 +12,7 @@ import Settings from "./pages/Settings";
 import SubscriptionPlans from "./pages/SubscriptionPlans";
 import Login from "./pages/Login";
 import Jobs from "./pages/Jobs.jsx";
+import JobDetails from "./pages/JobDetails.jsx";
 import JobSeekerJobs from "./pages/JobSeekerJobs.jsx";
 import SignUp from "./pages/SignUp.jsx";
 import NotFound from "./pages/NotFound";
@@ -33,6 +34,7 @@ function App() {
           <Route path="profile" element={<Profile />} />
           <Route path="seeker_profile" element={<SeekerProfile />} />
           <Route path="jobs" element={<Jobs />} />
+          <Route path="jobs/:id" element={<JobDetails />} />
           <Route path="jobSeekerJobs" element={<JobSeekerJobs />} />
           <Route path="settings" element={<Settings />} />
           <Route path="subscription_plans" element={<SubscriptionPlans />} />
