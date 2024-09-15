@@ -3,36 +3,34 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { AiFillDelete, AiOutlineProfile } from "react-icons/ai";
 import StarRating from "../components/sections/StarRating";
+import SeekerProfileDialog from "../components/dialogs/SeekerProfileDialog";
 
 const JobDetails = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-  const [job, setJob] = useState(null);
   const [seekers, setSeekers] = useState([]);
   const { id } = useParams();
-
+  const [selectedSeeker, setSelectedSeeker] = useState(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(false);
       try {
-        // Fetch applied seekers for the job
         const response = await axios.get(`/api/v1/applied/getByJobId/${id}`);
         const appliedData = response.data.data;
 
         if (appliedData.success === false) throw new Error(appliedData.message);
 
-        // Extract seeker details from the applied data
         const seekerPromises = appliedData.map(async (applied) => {
           // Fetch user data based on job_seeker_id
           const userResponse = await axios.get(
             `/api/v1/users/${applied.seeker.user_id}`
           );
           const userData = userResponse.data.data;
-          return { ...applied.seeker, ...userData }; // Combine seeker and user data
+          return { ...applied.seeker, ...userData };
         });
 
-        // Wait for all user data to be fetched and merged
         const seekersWithUserData = await Promise.all(seekerPromises);
 
         setSeekers(seekersWithUserData); // Update seekers state
@@ -52,6 +50,17 @@ const JobDetails = () => {
         seeker.id === seekerId ? { ...seeker, hrEvaluation: newRating } : seeker
       )
     );
+  };
+
+  const handleViewProfileClick = (seeker) => {
+    setSelectedSeeker(seeker);
+    setDialogOpen(true);
+  };
+
+  // Function to close the dialog
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setSelectedSeeker(null);
   };
 
   return (
@@ -95,6 +104,16 @@ const JobDetails = () => {
         </thead>
 
         <tbody>
+          {seekers.length === 0 && (
+            <tr>
+              <td
+                colSpan="5"
+                className="py-6 px-6 text-sm text-gray-700 whitespace-nowrap"
+              >
+                No seekers applied for this job
+              </td>
+            </tr>
+          )}
           {seekers.map((seeker) => (
             <tr key={seeker.id}>
               {console.log(seeker)}
@@ -150,7 +169,7 @@ const JobDetails = () => {
                   <AiOutlineProfile
                     title="View Profile"
                     className="text-green-400 text-xl hover:text-green-600 mr-2 cursor-pointer"
-                    // onClick={() => handleViewProfileClick(seeker.id)}
+                    onClick={() => handleViewProfileClick(seeker)}
                   >
                     View
                   </AiOutlineProfile>
@@ -168,6 +187,12 @@ const JobDetails = () => {
           ))}
         </tbody>
       </table>
+
+      <SeekerProfileDialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        seeker={selectedSeeker}
+      />
     </>
   );
 };
