@@ -29,12 +29,13 @@ const SeekerProfile = () => {
   const fileInputRef = useRef(null);
 
   const { currentUser } = useSelector((state) => state.user);
+  console.log(currentUser.user.id);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const response = await axios.get(
-          `api/v1/jobSeekers/getByUserId/${currentUser.user.job_seeker_id}`
+          `api/v1/jobSeekers/getByUserId/${currentUser.user.id}`
         );
         setUser(response.data.data);
         setLoading(false);
@@ -47,9 +48,7 @@ const SeekerProfile = () => {
 
     const getUserData = async () => {
       try {
-        const response = await axios.get(
-          `api/v1/users/${currentUser.user.job_seeker_id}`
-        );
+        const response = await axios.get(`api/v1/users/${currentUser.user.id}`);
         setProfile(response.data.data);
         setLoading(false);
       } catch (error) {

@@ -1,24 +1,29 @@
 import { useState, useEffect } from "react";
 import axios from "axios"; // Import Axios
+import { useSelector } from "react-redux";
 
 const JobSeekerJobs = () => {
   const [activeTab, setActiveTab] = useState("jobs");
-  const [findJobs, setFindJobs] = useState(false);
+  const [findJobs, setFindJobs] = useState(true);
   const [findCompanies, setFindCompanies] = useState(false);
   const [autoApply, setAutoApply] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
   const [searchResults, setSearchResults] = useState({
     jobs: [],
     companies: [],
   });
   const [selectedJob, setSelectedJob] = useState(null); // State to hold selected job
 
+  const { currentUser } = useSelector((state) => state.user);
+
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const resultsPerPage = 5;
 
   // Function to handle search
-  const handleSearch = async () => {
+  const handleSearch = async (e) => {
+    e.preventDefault();
     if (!findJobs && !findCompanies) {
       setSearchResults({
         jobs: [],
@@ -38,7 +43,6 @@ const JobSeekerJobs = () => {
       const data = response.data;
 
       const { jobs, companies } = data.data;
-      console.log(companies);
 
       setSearchResults({
         jobs,
@@ -79,6 +83,22 @@ const JobSeekerJobs = () => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
+  const applyForJob = async (job) => {
+    let applied = {
+      job_id: job.id,
+      job_seeker_id: currentUser.user.job_seeker_id,
+    };
+    setLoading(true);
+    try {
+      const response = await axios.post("/api/v1/applied/create", applied);
+      setLoading(false);
+      alert("Applied Successfully");
+    } catch (error) {
+      setLoading(false);
+      alert("Failed : You Already applied for this job");
+    }
+  };
+
   return (
     <div className="p-6">
       {/* Top Navigation */}
@@ -109,48 +129,88 @@ const JobSeekerJobs = () => {
       <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
         {/* Other filter inputs */}
         <div className="flex items-center justify-between">
-          <input
-            type="text"
-            placeholder="enter keyword and press enter"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full border-gray-300 rounded-md px-4 py-2"
-          />
-          <button
-            onClick={handleSearch}
-            className="ml-4 bg-primary text-white px-4 py-2 rounded-lg shadow"
-          >
-            Search
-          </button>
+          <form onSubmit={handleSearch} className="flex w-full space-x-4">
+            <input
+              type="text"
+              placeholder="Enter keyword and press enter"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+            <button
+              type="submit"
+              className="bg-primary text-white px-6 py-2 rounded-lg shadow hover:bg-primary-dark transition duration-300"
+            >
+              Search
+            </button>
+          </form>
         </div>
 
         {/* Toggles */}
         <div className="flex space-x-4 mt-4">
           <label className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              className="form-checkbox"
-              checked={findJobs}
-              onChange={() => setFindJobs(!findJobs)}
-            />
+            <div className="relative">
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={findJobs}
+                onChange={() => setFindJobs(!findJobs)}
+              />
+              <div
+                className={`block w-10 h-6 rounded-full ${
+                  findJobs ? "bg-green-500" : "bg-gray-300"
+                }`}
+              ></div>
+              <div
+                className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition ${
+                  findJobs ? "transform translate-x-4" : ""
+                }`}
+              ></div>
+            </div>
             <span>Find jobs</span>
           </label>
+
           <label className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              className="form-checkbox"
-              checked={findCompanies}
-              onChange={() => setFindCompanies(!findCompanies)}
-            />
+            <div className="relative">
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={findCompanies}
+                onChange={() => setFindCompanies(!findCompanies)}
+              />
+              <div
+                className={`block w-10 h-6 rounded-full ${
+                  findCompanies ? "bg-green-500" : "bg-gray-300"
+                }`}
+              ></div>
+              <div
+                className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition ${
+                  findCompanies ? "transform translate-x-4" : ""
+                }`}
+              ></div>
+            </div>
             <span>Find companies</span>
           </label>
+
           <label className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              className="form-checkbox"
-              checked={autoApply}
-              onChange={() => setAutoApply(!autoApply)}
-            />
+            <div className="relative">
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={autoApply}
+                onChange={() => setAutoApply(!autoApply)}
+              />
+              <div
+                className={`block w-10 h-6 rounded-full ${
+                  autoApply ? "bg-green-500" : "bg-gray-300"
+                }`}
+              ></div>
+              <div
+                className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition ${
+                  autoApply ? "transform translate-x-4" : ""
+                }`}
+              ></div>
+            </div>
             <span>Auto-apply Applications</span>
           </label>
         </div>
@@ -159,7 +219,7 @@ const JobSeekerJobs = () => {
       {/* Search Results */}
       <div className="flex space-x-4">
         {/* Left: Jobs or Companies List */}
-        <div className="w-2/3 bg-white p-4 rounded-lg shadow-lg">
+        <div className="w-1/3 bg-white p-4 rounded-lg shadow-lg">
           <h2 className="text-gray-700 mb-4">
             Search Result /{" "}
             <span className="text-green-500">
@@ -253,7 +313,7 @@ const JobSeekerJobs = () => {
         </div>
 
         {/* Right: Job or Company Detail */}
-        <div className="w-1/3 bg-white p-4 rounded-lg shadow-lg">
+        <div className="w-2/3 bg-white p-4 rounded-lg shadow-lg">
           <h2 className="text-gray-700 mb-4">Detail</h2>
           {activeTab === "jobs" && selectedJob ? (
             <div className="space-y-2">
@@ -294,6 +354,13 @@ const JobSeekerJobs = () => {
                 </span>{" "}
                 {selectedJob.requirements.qualifications.skills.join(", ")}
               </p>
+              <button
+                disabled={loading}
+                onClick={() => applyForJob(selectedJob)}
+                className="bg-primary text-white px-4 py-2 rounded-lg "
+              >
+                Apply
+              </button>
             </div>
           ) : activeTab === "companies" &&
             searchResults.companies.length > 0 ? (
