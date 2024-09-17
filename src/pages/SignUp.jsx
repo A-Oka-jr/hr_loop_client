@@ -92,7 +92,24 @@ const SignUp = () => {
               type="email"
               id="email"
               className="w-full px-3 py-2 border rounded-lg text-gray-700"
-              placeholder="Enter your Company email"
+              placeholder="Enter your email"
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="phone"
+            >
+              Email
+            </label>
+            <input
+              type="number"
+              id="phone"
+              className="w-full px-3 py-2 border rounded-lg text-gray-700"
+              placeholder="Enter your Phone Number"
               onChange={handleChange}
               required
             />
