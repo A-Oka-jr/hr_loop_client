@@ -100,7 +100,7 @@ const Sidebar = ({ onLogout }) => {
               </Link>
             </li>
           )}
-          {currentUser?.user.role && (
+          {/* {currentUser?.user.role && (
             <li className="mb-6">
               <Link
                 to="/settings"
@@ -110,7 +110,7 @@ const Sidebar = ({ onLogout }) => {
                 <span>Settings</span>
               </Link>
             </li>
-          )}
+          )} */}
 
           {currentUser?.user.role === null ||
             (currentUser?.user.role === "company_user" && (

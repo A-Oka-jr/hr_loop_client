@@ -200,9 +200,13 @@ const SubscriptionPlans = () => {
               <h3 className="mt-6 text-center text-xl font-semibold text-gray-900">
                 {plan.name}
               </h3>
-              <p className="mt-4 text-center text-gray-500">
-                {plan.description}
-              </p>
+              {console.log(plan.description)}
+              <div className="mt-4 text-left text-gray-500">
+                <div
+                  className="list-decimal pl-6"
+                  dangerouslySetInnerHTML={{ __html: plan.description }}
+                />
+              </div>
               <div className="mt-6 text-center">
                 <span className="text-2xl font-extrabold text-gray-900">
                   ${plan.price}
