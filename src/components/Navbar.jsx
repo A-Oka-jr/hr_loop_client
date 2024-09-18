@@ -8,6 +8,7 @@ import {
   signOutUserFailuar,
   signOutUserSuccess,
 } from "../redux/user/userSlice";
+import PropTypes from "prop-types";
 
 const Navbar = ({ onLogout }) => {
   const dispatch = useDispatch();
@@ -150,6 +151,10 @@ const Navbar = ({ onLogout }) => {
       </div>
     </nav>
   );
+};
+
+Navbar.propTypes = {
+  onLogout: PropTypes.func,
 };
 
 export default Navbar;

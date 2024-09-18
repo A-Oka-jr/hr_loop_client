@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 const AddJobseekerDialog = ({ isOpen, onClose, onSubmit }) => {
   const [address, setAddress] = useState("");
@@ -483,6 +484,12 @@ const AddJobseekerDialog = ({ isOpen, onClose, onSubmit }) => {
       </div>
     )
   );
+};
+
+AddJobseekerDialog.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
 };
 
 export default AddJobseekerDialog;

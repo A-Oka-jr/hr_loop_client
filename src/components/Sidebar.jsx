@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { AiFillHome, AiFillSetting, AiOutlineLogout } from "react-icons/ai";
+import { AiFillHome, AiOutlineLogout } from "react-icons/ai";
 import { FaGem } from "react-icons/fa";
 import { FaUserCircle } from "react-icons/fa";
 import { ImSearch } from "react-icons/im";
@@ -12,6 +12,7 @@ import {
   signOutUserSuccess,
 } from "../redux/user/userSlice";
 import axios from "axios";
+import PropTypes from "prop-types";
 
 const Sidebar = ({ onLogout }) => {
   const dispatch = useDispatch();
@@ -137,6 +138,10 @@ const Sidebar = ({ onLogout }) => {
       </div>
     </div>
   );
+};
+
+Sidebar.propTypes = {
+  onLogout: PropTypes.func,
 };
 
 export default Sidebar;

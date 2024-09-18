@@ -1,4 +1,4 @@
-import React from "react";
+import PropTypes from "prop-types";
 
 const RequirementsDialog = ({ isOpen, onClose, requirements }) => {
   if (!isOpen || !requirements) return null;
@@ -51,6 +51,12 @@ const RequirementsDialog = ({ isOpen, onClose, requirements }) => {
       </div>
     </div>
   );
+};
+
+RequirementsDialog.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  requirements: PropTypes.object,
 };
 
 export default RequirementsDialog;

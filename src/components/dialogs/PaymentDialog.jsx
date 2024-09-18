@@ -1,5 +1,6 @@
 // PaymentDialog.js
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 
 const PaymentDialog = ({ isOpen, onClose, onConfirm, plan }) => {
   const [fadeIn, setFadeIn] = useState(false);
@@ -137,6 +138,13 @@ const PaymentDialog = ({ isOpen, onClose, onConfirm, plan }) => {
       </div>
     </div>
   ) : null;
+};
+
+PaymentDialog.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onConfirm: PropTypes.func.isRequired,
+  plan: PropTypes.object,
 };
 
 export default PaymentDialog;

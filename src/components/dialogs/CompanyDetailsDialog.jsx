@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 const CompanyDetailsDialog = ({ isOpen, onClose, onNext }) => {
   const [name, setCompanyName] = useState("");
@@ -163,6 +164,12 @@ const CompanyDetailsDialog = ({ isOpen, onClose, onNext }) => {
       </div>
     )
   );
+};
+
+CompanyDetailsDialog.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onNext: PropTypes.func.isRequired,
 };
 
 export default CompanyDetailsDialog;

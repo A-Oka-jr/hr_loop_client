@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import PropTypes from "prop-types";
 
 const EditCompanyProfileDialog = ({
   isOpen,
@@ -128,6 +129,15 @@ const EditCompanyProfileDialog = ({
       </div>
     </div>
   );
+};
+
+EditCompanyProfileDialog.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  currentUser: PropTypes.object.isRequired,
+  setData: PropTypes.func.isRequired,
+  data: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
 };
 
 export default EditCompanyProfileDialog;

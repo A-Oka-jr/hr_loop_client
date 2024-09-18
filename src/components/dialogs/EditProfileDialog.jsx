@@ -356,6 +356,7 @@ EditProfileDialog.propTypes = {
   error: PropTypes.string,
   loading: PropTypes.bool.isRequired,
   user: PropTypes.shape({
+    // id: PropTypes.string.isRequired,
     profile_details: PropTypes.shape({
       first_name: PropTypes.string,
       last_name: PropTypes.string,
