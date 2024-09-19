@@ -136,7 +136,6 @@ const EditProfileDialog = ({
         console.error(data.message);
         return;
       }
-      console.log(data);
 
       alert("Profile updated successfully!");
       setLoading(false);

@@ -29,7 +29,6 @@ const SeekerProfile = () => {
   const fileInputRef = useRef(null);
 
   const { currentUser } = useSelector((state) => state.user);
-  console.log(currentUser.user.id);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -87,7 +86,7 @@ const SeekerProfile = () => {
         updatedUser.experience.jobs.push(newExperience);
 
         await axios.post(
-          `api/v1/jobSeekers/addExperience/${currentUser.user.job_seeker_id}`,
+          `api/v1/jobSeekers/addExperience/${currentUser.user.id}`,
           newExperience
         );
 
@@ -95,7 +94,7 @@ const SeekerProfile = () => {
         setIsAdding(false);
       } else {
         await axios.patch(
-          `api/v1/jobSeekers/updateExperience/${currentUser.user.job_seeker_id}`,
+          `api/v1/jobSeekers/updateExperience/${currentUser.user.id}`,
           { index: editingExperienceIndex, experience: newExperience }
         );
 
@@ -411,7 +410,7 @@ const SeekerProfile = () => {
             <EducationSection
               user={user}
               education={user.education}
-              jobSeekerId={currentUser.user.job_seeker_id}
+              jobSeekerId={currentUser.user.id}
               updateUser={setUser}
             />
           </div>
