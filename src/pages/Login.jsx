@@ -35,6 +35,10 @@ const Login = () => {
         navigate("/subscription_plans");
         return;
       }
+      if (data.user.role === "job_seeker") {
+        navigate("/seeker_profile");
+        return;
+      }
       navigate("/");
     } catch (error) {
       dispatch(

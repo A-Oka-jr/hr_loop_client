@@ -107,14 +107,14 @@ const SearchDialog = ({ isOpen, onClose, onSubmit }) => {
                   {skills.map((skill, index) => (
                     <span
                       key={index}
-                      className="inline-flex items-center px-3 py-1 rounded-full bg-primary text-white"
+                      className="bg-white text-primary border border-primary px-3 py-1 rounded-md flex items-center"
                     >
                       {skill}
                       <button
                         onClick={() => handleRemoveSkill(skill)}
-                        className="ml-2 text-white hover:bg-red-700 rounded-full p-1"
+                        className="ml-2 text-primary rounded-full p-1"
                       >
-                        x
+                        &times;
                       </button>
                     </span>
                   ))}

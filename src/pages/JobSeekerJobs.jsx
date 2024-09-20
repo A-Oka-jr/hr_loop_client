@@ -8,6 +8,8 @@ const JobSeekerJobs = () => {
   const [findCompanies, setFindCompanies] = useState(false);
   const [autoApply, setAutoApply] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [country, setCountry] = useState("");
+  const [skills, setSkills] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchResults, setSearchResults] = useState({
     jobs: [],
@@ -35,7 +37,9 @@ const JobSeekerJobs = () => {
     try {
       const response = await axios.get("/api/v1/jobs/search", {
         params: {
-          title: searchQuery,
+          title: searchQuery.toLocaleLowerCase(),
+          country: country.toLocaleLowerCase(),
+          skills,
           findJobs,
           findCompanies,
         },
@@ -79,7 +83,7 @@ const JobSeekerJobs = () => {
   );
 
   const formatDate = (dateString) => {
-    const options = { year: "numeric", month: "long" };
+    const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
@@ -132,10 +136,24 @@ const JobSeekerJobs = () => {
           <form onSubmit={handleSearch} className="flex w-full space-x-4">
             <input
               type="text"
-              placeholder="Enter keyword and press enter"
+              placeholder="Title"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-1/3 border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+            <input
+              type="text"
+              placeholder="Country"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              className="w-1/3 border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+            <input
+              type="text"
+              placeholder="Skills"
+              value={skills}
+              onChange={(e) => setSkills(e.target.value)}
+              className="w-1/3 border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
             />
             <button
               type="submit"
@@ -329,7 +347,7 @@ const JobSeekerJobs = () => {
                 {selectedJob.location}
               </p>
               <span className="text-xs text-gray-500">
-                {selectedJob.posted_date}
+                {formatDate(selectedJob.posted_date)}
               </span>
               <p className="text-sm">{selectedJob.description}</p>
               <span className="text-xs text-gray-500">

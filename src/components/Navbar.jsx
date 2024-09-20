@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -16,6 +16,7 @@ const Navbar = ({ onLogout }) => {
   const [isLangOpen, setLangOpen] = useState(false);
   const currentUser = useSelector((state) => state.user.currentUser);
   const [data, setData] = useState({});
+  const dropdownRef = useRef(null); // Add a ref for the dropdown
 
   const toggleDropdown = () => {
     setDropdownOpen(!isDropdownOpen);
@@ -63,7 +64,7 @@ const Navbar = ({ onLogout }) => {
     if (currentUser.user.role === "job_seeker") {
       fetchUserData();
     } else if (currentUser.user.role === "company_user") {
-      fetchCompanyData(); // Call the function properly
+      fetchCompanyData();
     }
   }, [currentUser]);
 
@@ -76,7 +77,7 @@ const Navbar = ({ onLogout }) => {
         dispatch(signOutUserFailuar(res.data.message));
         return;
       }
-
+      toggleDropdown;
       dispatch(signOutUserSuccess(res.data));
       if (typeof onLogout === "function") {
         onLogout();
@@ -86,38 +87,38 @@ const Navbar = ({ onLogout }) => {
     }
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false); // Close the dropdown if the click is outside
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isDropdownOpen]);
+
   return (
     <nav className="bg-primary p-4 flex justify-center items-center">
       <div className="flex items-center">
         <div className="flex items-center mr-2">
-          {/* user or comapny name */}
+          {/* user or company name */}
           <p className="text-white text-lg font-semibold">
             {currentUser.user.role === "job_seeker"
               ? data?.first_name + " " + data?.last_name
               : data.company?.name}
           </p>
         </div>
-        {/* <div className="relative">
-          <button
-            onClick={toggleLangDropdown}
-            className="text-white mx-2 focus:outline-none"
-          >
-            Language
-          </button>
-          {isLangOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg">
-              <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                English
-              </button>
-              <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                Arabic
-              </button>
-            </div>
-          )}
-        </div> */}
 
         {/* User Avatar */}
-        <div className="relative">
+        <div className="relative" ref={dropdownRef}>
           <button onClick={toggleDropdown} className="focus:outline-none">
             <img
               src={`http://localhost:3000/uploads/${
@@ -135,6 +136,7 @@ const Navbar = ({ onLogout }) => {
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg">
               <Link
                 to={"/profile"}
+                onClick={toggleDropdown}
                 className="block text-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 View Profile

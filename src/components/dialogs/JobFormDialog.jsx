@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import axios from "axios";
 
 const JobFormDialog = ({ isOpen, onClose, onSubmit, initialData }) => {
   const [formData, setFormData] = useState({
@@ -14,15 +15,20 @@ const JobFormDialog = ({ isOpen, onClose, onSubmit, initialData }) => {
       },
     },
     location: "",
+    country: "",
     type: "full_time",
     status: "",
     posted_date: "",
   });
 
+  const [countries, setCountries] = useState([]); // To store the fetched cities
   const [skillInput, setSkillInput] = useState(""); // Track current skill input
 
   useEffect(() => {
     if (isOpen) {
+      // Fetch cities from the API
+      fetchCountries();
+
       // Only update form data when the dialog is open
       if (initialData) {
         setFormData({
@@ -38,6 +44,7 @@ const JobFormDialog = ({ isOpen, onClose, onSubmit, initialData }) => {
               skills: initialData.requirements?.qualifications.skills || [],
             },
           },
+          country: initialData.country || "",
           location: initialData.location || "",
           type: initialData.type || "full_time",
           status: initialData.status || "",
@@ -63,6 +70,18 @@ const JobFormDialog = ({ isOpen, onClose, onSubmit, initialData }) => {
       }
     }
   }, [initialData, isOpen]);
+
+  const fetchCountries = async () => {
+    try {
+      const response = await axios.get(
+        "https://countriesnow.space/api/v0.1/countries/"
+      );
+      const data = response.data;
+      setCountries(data.data);
+    } catch (error) {
+      console.error("Error fetching countries:", error);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -140,6 +159,7 @@ const JobFormDialog = ({ isOpen, onClose, onSubmit, initialData }) => {
           skills: [],
         },
       },
+      country: "",
       location: "",
       type: "full_time",
       status: "",
@@ -263,6 +283,26 @@ const JobFormDialog = ({ isOpen, onClose, onSubmit, initialData }) => {
               />
             </div>
             <div className="flex-1">
+              <label className="block text-gray-700">Country</label>
+              <select
+                name="country"
+                value={formData.country}
+                onChange={handleChange}
+                className="mt-1 p-2 border border-gray-300 rounded w-full"
+              >
+                <option value="">Select a Country</option>
+                {countries.map((country) => (
+                  <option
+                    key={country.country}
+                    value={country?.country?.toLowerCase()}
+                  >
+                    {country.country}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex-1">
               <label className="block text-gray-700">Type</label>
               <select
                 name="type"
@@ -342,6 +382,7 @@ JobFormDialog.propTypes = {
       position: PropTypes.string,
     }),
     location: PropTypes.string,
+    country: PropTypes.string,
     type: PropTypes.oneOf([
       "full-time",
       "part-time",

@@ -155,6 +155,9 @@ const PostJob = ({
               Requirements
             </th>
             <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
+              Country
+            </th>
+            <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
               Location
             </th>
             <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
@@ -188,6 +191,9 @@ const PostJob = ({
                 onClick={() => handleRequirementsClick(job.requirements)}
               >
                 {job.requirements.position}
+              </td>
+              <td className="py-3 px-6 border-b border-gray-200">
+                {job.country}
               </td>
               <td className="py-3 px-6 border-b border-gray-200">
                 {job.location}
