@@ -4,6 +4,7 @@ import axios from "axios";
 import { AiFillDelete, AiOutlineProfile } from "react-icons/ai";
 import StarRating from "../components/sections/StarRating";
 import SeekerProfileDialog from "../components/dialogs/SeekerProfileDialog";
+import SendEvaluationAndInvitationDialog from "../components/dialogs/SendEvaluationAndInvitationDialog"; // Import your dialog
 
 const JobDetails = () => {
   const [loading, setLoading] = useState(false);
@@ -12,6 +13,9 @@ const JobDetails = () => {
   const { id } = useParams();
   const [selectedSeeker, setSelectedSeeker] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [sendDialogOpen, setSendDialogOpen] = useState(false); // Manage Send Dialog open state
+  const [selectedSeekers, setSelectedSeekers] = useState([]); // Manage selected seekers for send dialog
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -28,7 +32,12 @@ const JobDetails = () => {
             `/api/v1/users/${applied.seeker.user_id}`
           );
           const userData = userResponse.data.data;
-          return { ...applied.seeker, ...userData };
+          return {
+            ...applied.seeker,
+            ...userData,
+            sendForEvaluation: false,
+            sendInvitation: false,
+          };
         });
 
         const seekersWithUserData = await Promise.all(seekerPromises);
@@ -57,10 +66,49 @@ const JobDetails = () => {
     setDialogOpen(true);
   };
 
-  // Function to close the dialog
+  // Function to close the profile dialog
   const handleCloseDialog = () => {
     setDialogOpen(false);
     setSelectedSeeker(null);
+  };
+
+  const handleCheckboxChange = (seekerId, field) => {
+    setSeekers((prevSeekers) =>
+      prevSeekers.map((seeker) =>
+        seeker.id === seekerId
+          ? {
+              ...seeker,
+              sendForEvaluation: field === "sendForEvaluation" ? true : false,
+              sendInvitation: field === "sendInvitation" ? true : false,
+            }
+          : seeker
+      )
+    );
+  };
+
+  // Handle Send button click
+  const handleSendClick = () => {
+    const selected = seekers
+      .filter((seeker) => seeker.sendForEvaluation || seeker.sendInvitation)
+      .map((seeker) => ({
+        id: seeker.id,
+        name: `${seeker.first_name} ${seeker.last_name}`,
+        email: seeker.email,
+        address: seeker.address || "",
+        skills: seeker.skills || [],
+        education: seeker.education || "",
+        experience: seeker.experience || 0,
+        hrEvaluation: seeker.hrEvaluation || 0,
+        sendForEvaluation: seeker.sendForEvaluation,
+        sendInvitation: seeker.sendInvitation,
+      }));
+    setSelectedSeekers(selected);
+    setSendDialogOpen(true);
+  };
+
+  // Close the send dialog
+  const handleCloseSendDialog = () => {
+    setSendDialogOpen(false);
   };
 
   return (
@@ -76,7 +124,7 @@ const JobDetails = () => {
       <div className="flex items-end justify-end">
         <button
           className="bg-primary text-white py-2 px-4 rounded-lg hover:bg-violet-950 mb-4"
-          //   onClick={handleAddJobClick}
+          onClick={handleSendClick} // Handle send button click
         >
           Send
         </button>
@@ -116,8 +164,6 @@ const JobDetails = () => {
           )}
           {seekers.map((seeker) => (
             <tr key={seeker.id}>
-              {console.log(seeker)}
-
               <td className="py-6 px-6 text-sm text-gray-700 whitespace-nowrap">
                 <div className="flex items-center justify-center">
                   <img
@@ -144,10 +190,11 @@ const JobDetails = () => {
                 <div className="flex items-center justify-center">
                   <input
                     type="checkbox"
-                    className="w-6 h-6" // Size of the checkbox
-                    name=""
-                    id=""
-                    value=""
+                    className="w-6 h-6"
+                    checked={seeker.sendForEvaluation}
+                    onChange={() =>
+                      handleCheckboxChange(seeker.id, "sendForEvaluation")
+                    }
                   />
                 </div>
               </td>
@@ -156,31 +203,22 @@ const JobDetails = () => {
                 <div className="flex items-center justify-center">
                   <input
                     type="checkbox"
-                    className="w-6 h-6" // Size of the checkbox
-                    name=""
-                    id=""
-                    value=""
+                    className="w-6 h-6"
+                    checked={seeker.sendInvitation}
+                    onChange={() =>
+                      handleCheckboxChange(seeker.id, "sendInvitation")
+                    }
                   />
                 </div>
               </td>
 
               <td className="py-3 px-6 text-sm text-gray-700 whitespace-nowrap">
-                <div className="flex items-center justify-center">
+                <div className="flex items-center justify-center gap-5">
                   <AiOutlineProfile
-                    title="View Profile"
-                    className="text-green-400 text-xl hover:text-green-600 mr-2 cursor-pointer"
+                    className="text-2xl text-primary cursor-pointer"
                     onClick={() => handleViewProfileClick(seeker)}
-                  >
-                    View
-                  </AiOutlineProfile>
-
-                  <AiFillDelete
-                    title="Delete Job"
-                    className="text-red-400 text-xl hover:text-red-600 mr-2 cursor-pointer"
-                    // onClick={() => handleDeleteJobClick(job.id)}
-                  >
-                    Delete
-                  </AiFillDelete>
+                  />
+                  <AiFillDelete className="text-2xl text-red-500 cursor-pointer" />
                 </div>
               </td>
             </tr>
@@ -188,10 +226,20 @@ const JobDetails = () => {
         </tbody>
       </table>
 
-      <SeekerProfileDialog
-        open={dialogOpen}
-        onClose={handleCloseDialog}
-        seeker={selectedSeeker}
+      {selectedSeeker && (
+        <SeekerProfileDialog
+          open={dialogOpen}
+          onClose={handleCloseDialog}
+          seeker={selectedSeeker}
+        />
+      )}
+
+      {/* Include the new Send Evaluation dialog */}
+      <SendEvaluationAndInvitationDialog
+        open={sendDialogOpen}
+        onClose={handleCloseSendDialog}
+        selectedSeekers={selectedSeekers}
+        jobId={id}
       />
     </>
   );
