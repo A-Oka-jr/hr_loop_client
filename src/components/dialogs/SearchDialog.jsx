@@ -1,11 +1,15 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 
-const SearchDialog = ({ isOpen, onClose, onSubmit }) => {
+const SearchDialog = ({ isOpen, onClose, onSubmit, countries }) => {
   const [name, setName] = useState("");
+  const [jobTitle, setJobTitle] = useState("");
   const [type, setType] = useState("");
   const [skills, setSkills] = useState([]);
   const [skillInput, setSkillInput] = useState("");
+  const [description, setDescription] = useState("");
+  const [jobType, setJobType] = useState("");
+  const [country, setCountry] = useState(""); // State for selected country
 
   if (!isOpen) return null;
 
@@ -19,7 +23,15 @@ const SearchDialog = ({ isOpen, onClose, onSubmit }) => {
 
   // Handle form submission
   const handleSubmit = () => {
-    const searchData = { name, type, skills };
+    const searchData = {
+      name,
+      job_title: jobTitle,
+      type,
+      skills,
+      description,
+      job_type: jobType,
+      country,
+    };
     onSubmit(searchData, resetForm); // Pass resetForm as a callback
     onClose();
   };
@@ -67,6 +79,23 @@ const SearchDialog = ({ isOpen, onClose, onSubmit }) => {
               required
             />
           </div>
+          <div className="mb-4">
+            <label
+              htmlFor="title"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Job Title
+            </label>
+            <input
+              id="title"
+              type="text"
+              value={jobTitle}
+              onChange={(e) => setJobTitle(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+              placeholder="Enter search title"
+              required
+            />
+          </div>
 
           <div className="mb-4">
             <label
@@ -86,6 +115,23 @@ const SearchDialog = ({ isOpen, onClose, onSubmit }) => {
               <option value="loop">Loop</option>
               <option value="search">Search</option>
             </select>
+          </div>
+
+          <div className="mb-4">
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Job Description
+            </label>
+            <textarea
+              type="text"
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+              required
+            />
           </div>
 
           {/* Skills Input */}
@@ -120,6 +166,47 @@ const SearchDialog = ({ isOpen, onClose, onSubmit }) => {
                   ))}
                 </div>
               )}
+            </div>
+            {/* Inline Job Type Inputs */}
+            <div className="flex gap-4 mt-4">
+              <div className="flex-1">
+                <label
+                  htmlFor="jobType1"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Job Type
+                </label>
+                <select
+                  id="jobType1"
+                  value={jobType}
+                  onChange={(e) => setJobType(e.target.value)}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                >
+                  <option value="full_time">Full Time</option>
+                  <option value="remote">Remote</option>
+                  <option value="contract">Contract</option>
+                  <option value="part_time">Part Time</option>
+                </select>
+              </div>
+              <div className="flex-1">
+                <label className="block text-gray-700">Country</label>
+                <select
+                  name="country"
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  className="mt-1 p-2 border border-gray-300 rounded w-full"
+                >
+                  <option value="">Select a Country</option>
+                  {countries.map((countryOption) => (
+                    <option
+                      key={countryOption.country}
+                      value={countryOption?.country?.toLowerCase()}
+                    >
+                      {countryOption.country}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 

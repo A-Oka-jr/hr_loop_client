@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import { AiFillDelete, AiFillFolderOpen } from "react-icons/ai";
@@ -20,6 +20,7 @@ const FindCandidates = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { currentUser } = useSelector((state) => state.user);
+  const [countries, setCountries] = useState([]);
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
@@ -32,6 +33,22 @@ const FindCandidates = ({
   const handleDialogClose = () => {
     setIsDialogOpen(false);
   };
+
+  useEffect(() => {
+    fetchCountries();
+    async function fetchCountries() {
+      try {
+        const response = await axios.get(
+          "https://countriesnow.space/api/v0.1/countries"
+        );
+        const data = response.data;
+        setCountries(data.data);
+      } catch (error) {
+        console.error("Error fetching countries:", error);
+      }
+    }
+    fetchCountries();
+  }, [requests]);
 
   const handleJobSubmit = async (searchData, resetForm) => {
     setError(false);
@@ -121,6 +138,9 @@ const FindCandidates = ({
                   Name
                 </th>
                 <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
+                  registered Candidates
+                </th>
+                <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
                   Date
                 </th>
                 <th className="py-3 px-6 bg-gray-100 text-left text-sm font-semibold text-gray-700 uppercase">
@@ -138,11 +158,17 @@ const FindCandidates = ({
                     {request.name}
                   </td>
                   <td className="py-3 px-6 border-b border-gray-200">
+                    {request?.results?.length}
+                  </td>
+                  <td className="py-3 px-6 border-b border-gray-200">
                     {new Date(request.createdAt).toLocaleDateString()}
                   </td>
                   <td className="py-3 px-6 border-b border-gray-200">
                     <div className="flex">
-                      <Link className="mr-2">
+                      <Link
+                        to={`/search/seekers/${request.id}`} // Navigate to seekers page with search ID
+                        className="mr-2"
+                      >
                         <AiFillFolderOpen className="text-primary text-xl hover:text-violet-950" />
                       </Link>
                       <div>|</div>
@@ -181,6 +207,7 @@ const FindCandidates = ({
             isOpen={isDialogOpen}
             onClose={handleDialogClose}
             onSubmit={handleJobSubmit}
+            countries={countries}
           />
         </>
       )}
