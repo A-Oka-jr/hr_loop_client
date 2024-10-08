@@ -176,7 +176,7 @@ const JobFormDialog = ({ isOpen, onClose, onSubmit, initialData }) => {
         className="fixed inset-0 bg-black opacity-40"
         onClick={handleClose}
       ></div>
-      <div className="bg-white p-8 rounded-lg shadow-lg z-10 w-full max-w-lg">
+      <div className="bg-white p-8 rounded-lg shadow-lg z-10 w-full max-w-3xl">
         <h2 className="text-2xl font-bold mb-4">Job Form</h2>
         <form onSubmit={handleSubmit}>
           <div className="flex flex-wrap gap-4">
@@ -356,7 +356,7 @@ const JobFormDialog = ({ isOpen, onClose, onSubmit, initialData }) => {
             </button>
             <button
               type="submit"
-              className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
+              className="bg-primary text-white py-2 px-4 rounded-lg hover:opacity-90"
             >
               Submit
             </button>

@@ -8,6 +8,7 @@ const JobSeekerJobs = () => {
   const [findCompanies, setFindCompanies] = useState(false);
   const [autoApply, setAutoApply] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [saveItAsLoop, setSaveItAsLoop] = useState(false); // Save it as Loop state
   const [country, setCountry] = useState("");
   const [skills, setSkills] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,6 +19,7 @@ const JobSeekerJobs = () => {
   const [selectedJob, setSelectedJob] = useState(null); // State to hold selected job
 
   const { currentUser } = useSelector((state) => state.user);
+  const [loops, setLoops] = useState([]);
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -52,6 +54,22 @@ const JobSeekerJobs = () => {
         jobs,
         companies,
       });
+      if (saveItAsLoop) {
+        await axios.post("/api/v1/loops/save", {
+          userId: currentUser.id,
+          query: {
+            title: searchQuery,
+            country,
+            skills,
+            findJobs,
+            findCompanies,
+          },
+          results: {
+            jobs,
+            companies,
+          },
+        });
+      }
 
       // Reset to first page when new results are fetched
       setCurrentPage(1);
@@ -63,11 +81,6 @@ const JobSeekerJobs = () => {
   // Function to handle job click
   const handleJobClick = (job) => {
     setSelectedJob(job);
-  };
-
-  // Function for loop buttons
-  const handleLoopClick = (loop) => {
-    console.log(`hi from ${loop}`);
   };
 
   // Calculate paginated results
@@ -103,29 +116,43 @@ const JobSeekerJobs = () => {
     }
   };
 
+  useEffect(() => {
+    // Fetch loops from the API
+    const fetchLoops = async () => {
+      try {
+        const response = await axios.get("/api/loops"); // Replace with your API endpoint
+        setLoops(response.data); // Assuming response data contains an array of loop names
+      } catch (error) {
+        console.error("Error fetching loops:", error);
+      }
+    };
+
+    fetchLoops();
+  }, []);
+
+  const handleLoopClick = (loopName) => {
+    console.log(`Clicked ${loopName}`);
+    // Add your loop logic here
+  };
+
   return (
     <div className="p-6">
       {/* Top Navigation */}
       <div className="flex justify-between items-center mb-6">
         <div className="space-x-4">
-          <button
-            onClick={() => handleLoopClick("loop1")}
-            className="bg-gray-100 px-4 py-2 rounded-lg shadow"
-          >
-            loop 1
-          </button>
-          <button
-            onClick={() => handleLoopClick("loop2")}
-            className="bg-gray-100 px-4 py-2 rounded-lg shadow"
-          >
-            loop 2
-          </button>
-          <button
-            onClick={() => handleLoopClick("loop3")}
-            className="bg-gray-100 px-4 py-2 rounded-lg shadow"
-          >
-            loop 3
-          </button>
+          {loops.length > 0 ? (
+            loops.map((loop, index) => (
+              <button
+                key={index}
+                onClick={() => handleLoopClick(loop)}
+                className="bg-gray-100 px-4 py-2 rounded-lg shadow"
+              >
+                {loop}
+              </button>
+            ))
+          ) : (
+            <p>No loops found.</p>
+          )}
         </div>
       </div>
 
@@ -230,6 +257,28 @@ const JobSeekerJobs = () => {
               ></div>
             </div>
             <span>Auto-apply Applications</span>
+          </label>
+
+          <label className="flex items-center space-x-2">
+            <div className="relative">
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={saveItAsLoop}
+                onChange={() => setSaveItAsLoop(!saveItAsLoop)}
+              />
+              <div
+                className={`block w-10 h-6 rounded-full ${
+                  saveItAsLoop ? "bg-green-500" : "bg-gray-300"
+                }`}
+              ></div>
+              <div
+                className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition ${
+                  saveItAsLoop ? "transform translate-x-4" : ""
+                }`}
+              ></div>
+            </div>
+            <span>Save it as Loop</span>
           </label>
         </div>
       </div>

@@ -52,7 +52,7 @@ const SearchDialog = ({ isOpen, onClose, onSubmit, countries }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-900 bg-opacity-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl">
         <h2 className="text-xl font-semibold mb-4">Search Candidates</h2>
 
         {/* Form */}
@@ -62,39 +62,41 @@ const SearchDialog = ({ isOpen, onClose, onSubmit, countries }) => {
             handleSubmit();
           }}
         >
-          <div className="mb-4">
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Search Name
-            </label>
-            <input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-              placeholder="Enter search title"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              htmlFor="title"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Job Title
-            </label>
-            <input
-              id="title"
-              type="text"
-              value={jobTitle}
-              onChange={(e) => setJobTitle(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-              placeholder="Enter search title"
-              required
-            />
+          <div className="flex items-center justify-between gap-3">
+            <div className="mb-4 w-full">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Search Name
+              </label>
+              <input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                placeholder="Enter search title"
+                required
+              />
+            </div>
+            <div className="mb-4 w-full">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Job Title
+              </label>
+              <input
+                id="title"
+                type="text"
+                value={jobTitle}
+                onChange={(e) => setJobTitle(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                placeholder="Enter search title"
+                required
+              />
+            </div>
           </div>
 
           <div className="mb-4">

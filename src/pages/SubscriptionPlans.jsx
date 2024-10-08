@@ -217,7 +217,7 @@ const SubscriptionPlans = () => {
               </div>
               <div className="mt-8">
                 <button
-                  className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700"
+                  className="w-full bg-primary text-white py-2 px-4 rounded-lg hover:opacity-90"
                   onClick={() => handleChoosePlan(plan)}
                 >
                   Choose Plan
