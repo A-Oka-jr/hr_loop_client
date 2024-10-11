@@ -129,19 +129,19 @@ const SignUp = () => {
               />
             </div>
 
-            {/* Phone */}
+            {/* mobile */}
             <div className="mb-4">
               <label
-                htmlFor="phone"
+                htmlFor="mobile"
                 className="block text-gray-700 font-semibold"
               >
-                Phone
+                mobile
               </label>
               <input
                 type="tel"
-                id="phone"
+                id="mobile"
                 className="w-full px-3 py-2 border rounded-lg mt-1 text-gray-700"
-                placeholder="Enter your phone number"
+                placeholder="Enter your mobile number"
                 onChange={handleChange}
                 required
               />

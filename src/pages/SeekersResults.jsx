@@ -3,7 +3,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import StarRating from "../components/sections/StarRating";
 import SeekerProfileDialog from "../components/dialogs/SeekerProfileDialog";
-import SendEvaluationAndInvitationDialog from "../components/dialogs/SendEvaluationAndInvitationDialog"; // Import your dialog
+import SendEvaluationAndInvitationDialog from "../components/dialogs/SendEvaluationAndInvitationDialog";
 import { AiFillDelete, AiOutlineProfile } from "react-icons/ai";
 
 const SeekersResults = () => {
@@ -11,7 +11,7 @@ const SeekersResults = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [error, setError] = useState(null);
-  const { id } = useParams(); // Gets the id directly from the URL
+  const { id } = useParams(); // Get the id from the URL
   const [selectedSeeker, setSelectedSeeker] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [sendDialogOpen, setSendDialogOpen] = useState(false); // Manage Send Dialog open state
@@ -33,17 +33,17 @@ const SeekersResults = () => {
         setLoading(false);
         setSearch(data);
         if (data && data.results && data.results.length > 0) {
-          setSeekers(data.seekers);
           const users = data.seekers.map(async (seeker) => {
             const userResponse = await axios.get(
               `/api/v1/users/${seeker.user_id}`
             );
             const userData = userResponse.data.data;
             return {
-              ...seeker.seeker,
+              ...seeker,
               ...userData,
               sendForEvaluation: false,
               sendInvitation: false,
+              hrEvaluation: 0, // Initialize hrEvaluation as 0
             };
           });
           const seekerPromises = await Promise.all(users);
@@ -59,6 +59,7 @@ const SeekersResults = () => {
     fetchJobs();
   }, [id]);
 
+  // Handle HR Evaluation Rating Change
   const handleRatingChange = (seekerId, newRating) => {
     setSeekers((prevSeekers) =>
       prevSeekers.map((seeker) =>
@@ -78,14 +79,14 @@ const SeekersResults = () => {
     setSelectedSeeker(null);
   };
 
+  // Handle checkbox changes for "Send for Evaluation" and "Send Invitation"
   const handleCheckboxChange = (seekerId, field) => {
     setSeekers((prevSeekers) =>
       prevSeekers.map((seeker) =>
         seeker.id === seekerId
           ? {
               ...seeker,
-              sendForEvaluation: field === "sendForEvaluation" ? true : false,
-              sendInvitation: field === "sendInvitation" ? true : false,
+              [field]: !seeker[field], // Toggle the value of the field (sendForEvaluation or sendInvitation)
             }
           : seeker
       )
@@ -222,12 +223,12 @@ const SeekersResults = () => {
                 </td>
 
                 <td className="py-3 px-6 text-sm text-gray-700 whitespace-nowrap">
-                  <div className="flex items-center justify-center gap-5">
+                  <div className="flex items-center justify-center">
                     <AiOutlineProfile
-                      className="text-2xl text-primary cursor-pointer"
+                      size={22}
                       onClick={() => handleViewProfileClick(seeker)}
                     />
-                    <AiFillDelete className="text-2xl text-red-500 cursor-pointer" />
+                    <AiFillDelete size={22} className="ml-4" />
                   </div>
                 </td>
               </tr>
@@ -235,18 +236,16 @@ const SeekersResults = () => {
           </tbody>
         </table>
       </div>
-      {selectedSeeker && (
-        <SeekerProfileDialog
-          open={dialogOpen}
-          onClose={handleCloseDialog}
-          seeker={selectedSeeker}
-        />
-      )}
+      <SeekerProfileDialog
+        seeker={selectedSeeker}
+        dialogOpen={dialogOpen}
+        handleCloseDialog={handleCloseDialog}
+      />
+
       <SendEvaluationAndInvitationDialog
         open={sendDialogOpen}
         onClose={handleCloseSendDialog}
-        selectedSeekers={selectedSeekers}
-        jobId={id}
+        selectedSeekers={selectedSeekers} // Pass the selected seekers to the dialog
       />
     </>
   );
