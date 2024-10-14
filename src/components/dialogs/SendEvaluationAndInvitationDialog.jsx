@@ -7,6 +7,8 @@ const SendEvaluationAndInvitationDialog = ({
   selectedSeekers,
   jobId,
 }) => {
+  console.log("selectedSeekers", selectedSeekers);
+
   // State for invitation form
   const [subject, setSubject] = useState("");
   const [address, setAddress] = useState("");
@@ -39,7 +41,13 @@ const SendEvaluationAndInvitationDialog = ({
       address,
       seekers: selectedSeekers
         .filter((seeker) => seeker.sendInvitation)
-        .map((seeker) => seeker.email),
+        .map((seeker) => ({
+          email: seeker.email, // Include the seeker's email
+          hrEvaluation: seeker.hrEvaluation, // Include the HR evaluation for each seeker
+          send_for_evaluation: seeker.sendForEvaluation,
+          send_invitation: seeker.sendInvitation,
+          seeker_id: seeker.id,
+        })),
     };
 
     const evaluationData = {

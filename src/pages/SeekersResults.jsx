@@ -16,6 +16,7 @@ const SeekersResults = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [sendDialogOpen, setSendDialogOpen] = useState(false); // Manage Send Dialog open state
   const [selectedSeekers, setSelectedSeekers] = useState([]); // Manage selected seekers for send dialog
+  const [appliedJobs, setAppliedJobs] = useState([]);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -56,6 +57,7 @@ const SeekersResults = () => {
       }
     };
 
+    // TODO fetchAppliedJobs
     fetchJobs();
   }, [id]);
 
