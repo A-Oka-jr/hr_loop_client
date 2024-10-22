@@ -16,9 +16,9 @@ const StarRating = ({ rating, onRatingChange }) => {
             onMouseLeave={() => setHover(null)} // Remove hover effect
           >
             {currentRating <= (hover || rating) ? (
-              <AiFillStar className="text-yellow-500 text-2xl" />
+              <AiFillStar className="text-green-500 text-2xl" />
             ) : (
-              <AiOutlineStar className="text-yellow-500 text-2xl" />
+              <AiOutlineStar className="text-green-500 text-2xl" />
             )}
           </span>
         );

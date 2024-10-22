@@ -35,10 +35,11 @@ const JobDetails = () => {
           const userData = userResponse.data.data;
           return {
             appliedId: applied.id,
+            hrEvaluation: applied.hr_evaluation,
+            sendForEvaluation: applied.send_for_evaluation,
+            sendInvitation: applied.send_invitation,
             ...applied.seeker,
             ...userData,
-            sendForEvaluation: false,
-            sendInvitation: false,
           };
         });
 
@@ -51,7 +52,6 @@ const JobDetails = () => {
         setError(error.message);
       }
     };
-
     fetchData();
   }, [id]);
 
