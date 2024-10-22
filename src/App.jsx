@@ -16,6 +16,7 @@ import SeekersResults from "./pages/SeekersResults";
 import JobDetails from "./pages/JobDetails.jsx";
 import JobSeekerJobs from "./pages/JobSeekerJobs.jsx";
 import SignUp from "./pages/SignUp.jsx";
+import Evaluation from "./pages/Evaluation";
 import NotFound from "./pages/NotFound";
 import { useSelector } from "react-redux";
 
@@ -43,6 +44,7 @@ function App() {
           <Route path="*" element={<NotFound />} />{" "}
           {/* Catch-all route for 404 */}
         </Route>
+        <Route path="evaluation/:id" element={<Evaluation />} />
         <Route path="*" element={<NotFound />} />{" "}
         {/* Fallback for any undefined routes */}
       </Routes>
