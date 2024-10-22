@@ -20,6 +20,8 @@ const SeekersResults = () => {
 
   useEffect(() => {
     const fetchJobs = async () => {
+      console.log("fetching jobs");
+
       setLoading(true);
       setError(null);
       try {

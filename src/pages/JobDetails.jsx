@@ -31,8 +31,10 @@ const JobDetails = () => {
           const userResponse = await axios.get(
             `/api/v1/users/${applied.seeker.user_id}`
           );
+
           const userData = userResponse.data.data;
           return {
+            appliedId: applied.id,
             ...applied.seeker,
             ...userData,
             sendForEvaluation: false,
@@ -92,6 +94,7 @@ const JobDetails = () => {
       .filter((seeker) => seeker.sendForEvaluation || seeker.sendInvitation)
       .map((seeker) => ({
         id: seeker.id,
+        appliedId: seeker.appliedId,
         name: `${seeker.first_name} ${seeker.last_name}`,
         email: seeker.email,
         address: seeker.address || "",

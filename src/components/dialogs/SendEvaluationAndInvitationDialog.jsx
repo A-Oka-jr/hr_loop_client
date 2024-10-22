@@ -42,15 +42,31 @@ const SendEvaluationAndInvitationDialog = ({
       seekers: selectedSeekers
         .filter((seeker) => seeker.sendInvitation)
         .map((seeker) => ({
+          appliedId: seeker.appliedId,
           email: seeker.email, // Include the seeker's email
-          hrEvaluation: seeker.hrEvaluation, // Include the HR evaluation for each seeker
+          hr_evaluation: seeker.hrEvaluation, // Include the HR evaluation for each seeker
           send_for_evaluation: seeker.sendForEvaluation,
           send_invitation: seeker.sendInvitation,
           seeker_id: seeker.id,
         })),
     };
 
+    // const evaluationData = {
+    //   seekers: selectedSeekers
+    //     .filter((seeker) => seeker.sendForEvaluation)
+    //     .map((seeker) => ({
+    //       appliedId: seeker.appliedId,
+    //       email: seeker.email,
+    //     })),
+    // };
     const evaluationData = {
+      seekers: selectedSeekers
+        .filter((seeker) => seeker.sendForEvaluation)
+        .map((seeker) => ({
+          appliedId: seeker.appliedId,
+          hr_evaluation: seeker.hrEvaluation,
+          send_for_evaluation: seeker.sendForEvaluation,
+        })),
       emails: evaluationEmails.filter((email) =>
         selectedSeekers.some((seeker) => seeker.sendForEvaluation)
       ),
@@ -68,6 +84,8 @@ const SendEvaluationAndInvitationDialog = ({
 
       // Send evaluation data to the API
       if (evaluationData.emails.length > 0) {
+        console.log(evaluationData);
+
         await axios.post(
           `/api/v1/emails/send-evaluation/${jobId}`,
           evaluationData
