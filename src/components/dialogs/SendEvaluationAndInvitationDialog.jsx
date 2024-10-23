@@ -50,15 +50,6 @@ const SendEvaluationAndInvitationDialog = ({
           seeker_id: seeker.id,
         })),
     };
-
-    // const evaluationData = {
-    //   seekers: selectedSeekers
-    //     .filter((seeker) => seeker.sendForEvaluation)
-    //     .map((seeker) => ({
-    //       appliedId: seeker.appliedId,
-    //       email: seeker.email,
-    //     })),
-    // };
     const evaluationData = {
       seekers: selectedSeekers
         .filter((seeker) => seeker.sendForEvaluation)

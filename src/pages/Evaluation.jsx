@@ -36,6 +36,7 @@ const Evaluation = () => {
           return {
             appliedId: applied.id,
             hrEvaluation: applied.hr_evaluation,
+            departmentEvaluation: applied.department_evaluations,
             sendForEvaluation: applied.send_for_evaluation,
             sendInvitation: applied.send_invitation,
             ...applied.seeker,
@@ -55,10 +56,15 @@ const Evaluation = () => {
     fetchData();
   }, [id]);
 
-  const handleRatingChange = (seekerId, newRating) => {
+  const handleRatingChange = (seekerId, field, newRating) => {
     setSeekers((prevSeekers) =>
       prevSeekers.map((seeker) =>
-        seeker.id === seekerId ? { ...seeker, hrEvaluation: newRating } : seeker
+        seeker.id === seekerId
+          ? {
+              ...seeker,
+              [field]: newRating,
+            }
+          : seeker
       )
     );
   };
@@ -89,7 +95,7 @@ const Evaluation = () => {
   };
 
   // Handle Send button click
-  const handleSendClick = () => {
+  const handleSendClick = async () => {
     const selected = seekers
       .filter((seeker) => seeker.sendForEvaluation || seeker.sendInvitation)
       .map((seeker) => ({
@@ -101,18 +107,40 @@ const Evaluation = () => {
         skills: seeker.skills || [],
         education: seeker.education || "",
         experience: seeker.experience || 0,
-        hrEvaluation: seeker.hrEvaluation || 0,
+        hr_evaluation: seeker.hrEvaluation || 0,
+        department_evaluations: seeker.departmentEvaluation || 0,
         sendForEvaluation: seeker.sendForEvaluation,
         sendInvitation: seeker.sendInvitation,
       }));
-    setSelectedSeekers(selected);
-    setSendDialogOpen(true);
+
+    console.log("selected", selected);
+    sendEvaluation(selected);
+    // setSelectedSeekers(selected);
+    // setSendDialogOpen(true);
+  };
+
+  const sendEvaluation = async (selectedSeekers) => {
+    setLoading(true);
+    setError(false);
+    const data = await axios.put(
+      `/api/v1/applied/update/${id}`,
+      selectedSeekers
+    );
+    try {
+      setLoading(false);
+      console.log(data.data);
+    } catch (error) {
+      setLoading(false);
+      setError(true);
+      console.error(error);
+    }
+    setSendDialogOpen(false);
   };
 
   // Close the send dialog
-  const handleCloseSendDialog = () => {
-    setSendDialogOpen(false);
-  };
+  // const handleCloseSendDialog = () => {
+  //   setSendDialogOpen(false);
+  // };
 
   return (
     <>
@@ -185,9 +213,9 @@ const Evaluation = () => {
               <td className="py-3 px-6 text-sm text-gray-700 whitespace-nowrap">
                 <div className="flex items-center justify-center">
                   <StarRating
-                    rating={seeker.hrEvaluation || 0}
+                    rating={seeker.hrEvaluation || 0} // First StarRating for hrEvaluation
                     onRatingChange={(newRating) =>
-                      handleRatingChange(seeker.id, newRating)
+                      handleRatingChange(seeker.id, "hrEvaluation", newRating)
                     }
                   />
                 </div>
@@ -195,13 +223,18 @@ const Evaluation = () => {
               <td className="py-3 px-6 text-sm text-gray-700 whitespace-nowrap">
                 <div className="flex items-center justify-center">
                   <StarRating
-                    rating={seeker.departmentEvaluation || 0}
+                    rating={seeker.departmentEvaluation || 0} // Second StarRating for departmentEvaluation
                     onRatingChange={(newRating) =>
-                      handleRatingChange(seeker.id, newRating)
+                      handleRatingChange(
+                        seeker.id,
+                        "departmentEvaluation",
+                        newRating
+                      )
                     }
                   />
                 </div>
               </td>
+
               <td className="py-3 px-6 text-sm text-gray-700 whitespace-nowrap">
                 <div className="flex items-center justify-center">
                   <input
@@ -251,12 +284,12 @@ const Evaluation = () => {
       )}
 
       {/* Include the new Send Evaluation dialog */}
-      <SendEvaluationAndInvitationDialog
+      {/* <SendEvaluationAndInvitationDialog
         open={sendDialogOpen}
         onClose={handleCloseSendDialog}
         selectedSeekers={selectedSeekers}
         jobId={id}
-      />
+      /> */}
     </>
   );
 };
