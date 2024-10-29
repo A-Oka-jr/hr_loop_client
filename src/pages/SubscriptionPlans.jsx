@@ -145,7 +145,7 @@ const SubscriptionPlans = () => {
         console.log("Jobseeker details submitted successfully!");
         setIsJobseekerDialogOpen(false);
         const newRole = "job_seeker";
-        const jobSeeker = response.data.jobSeeker;
+        const jobSeeker = response.data.data;
         dispatch(updateUserRole(newRole, jobSeeker));
 
         const updatedUser = {
