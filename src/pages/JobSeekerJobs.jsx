@@ -127,7 +127,7 @@ const JobSeekerJobs = () => {
       }
     };
 
-    fetchLoops();
+    // fetchLoops();
   }, []);
 
   const handleLoopClick = (loopName) => {
