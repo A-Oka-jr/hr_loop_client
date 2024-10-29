@@ -121,7 +121,7 @@ const Navbar = ({ onLogout }) => {
         <div className="relative" ref={dropdownRef}>
           <button onClick={toggleDropdown} className="focus:outline-none">
             <img
-              src={`http://localhost:3000/uploads/${
+              src={`http://87.106.35.124/uploads/${
                 currentUser.user.role === "job_seeker"
                   ? data?.photo
                   : data.company?.image

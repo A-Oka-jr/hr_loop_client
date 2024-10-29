@@ -109,7 +109,7 @@ const Profile = () => {
     <div className="container mx-auto p-8">
       <div className="flex items-center space-x-6 mb-8 border-b border-gray-300 pb-6">
         <img
-          src={`http://localhost:3000/uploads/${data.company?.image}`}
+          src={`http://87.106.35.124/uploads/${data.company?.image}`}
           alt="Profile"
           className="w-32 h-32 rounded-full border-4 border-primary shadow-lg cursor-pointer"
           onClick={handleImageClick}

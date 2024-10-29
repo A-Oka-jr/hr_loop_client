@@ -182,7 +182,7 @@ const SeekersResults = () => {
                   <div className="flex items-center justify-center">
                     <img
                       className="w-14 h-14 rounded-full"
-                      src={`http://localhost:3000/uploads/${seeker.photo}`}
+                      src={`http://87.106.35.124/uploads/${seeker.photo}`}
                       alt="candidate_image"
                     />
                     <p className="ml-2">

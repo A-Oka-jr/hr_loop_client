@@ -212,7 +212,7 @@ const SeekerProfile = () => {
           <img
             className="w-32 h-32 object-center rounded-full border-4 border-white cursor-pointer"
             src={
-              `http://localhost:3000/uploads/${profile.photo}`
+              `http://87.106.35.124/uploads/${profile.photo}`
               //  || "https://randomuser.me/api/portraits/men/75.jpg"
             }
             alt="Profile"
@@ -417,8 +417,8 @@ const SeekerProfile = () => {
           <div className="mt-6">
             <h3 className="text-lg font-semibold text-gray-800 mt-6">Resume</h3>
             <a
-              // href={`http://localhost:3000/uploads/${user.resume_file}`}
-              download={`http://localhost:3000/uploads/${user.resume_file}`}
+              // href={`http://87.106.35.124/uploads/${user.resume_file}`}
+              download={`http://87.106.35.124/uploads/${user.resume_file}`}
               className="text-blue-600 hover:underline"
             >
               Download Resume

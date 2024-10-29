@@ -16,7 +16,7 @@ const SeekerProfileDialog = ({ open, onClose, seeker }) => {
           <div className="flex items-center space-x-4">
             <img
               className="w-24 h-24 rounded-full"
-              src={`http://localhost:3000/uploads/${seeker.photo}`}
+              src={`http://87.106.35.124/uploads/${seeker.photo}`}
               alt="Seeker Profile"
             />
             <div>
