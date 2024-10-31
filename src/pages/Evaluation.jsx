@@ -173,14 +173,9 @@ const Evaluation = () => {
             <th className="py-3 px-6 bg-gray-100 text-center text-sm font-semibold text-gray-700 uppercase">
               Department Evaluation
             </th>
+
             <th className="py-3 px-6 bg-gray-100 text-center text-sm font-semibold text-gray-700 uppercase">
-              Send For Evaluation
-            </th>
-            <th className="py-3 px-6 bg-gray-100 text-center text-sm font-semibold text-gray-700 uppercase">
-              Send Invitation
-            </th>
-            <th className="py-3 px-6 bg-gray-100 text-center text-sm font-semibold text-gray-700 uppercase">
-              Options
+              CVS
             </th>
           </tr>
         </thead>
@@ -236,38 +231,11 @@ const Evaluation = () => {
               </td>
 
               <td className="py-3 px-6 text-sm text-gray-700 whitespace-nowrap">
-                <div className="flex items-center justify-center">
-                  <input
-                    type="checkbox"
-                    className="w-6 h-6"
-                    checked={seeker.sendForEvaluation}
-                    onChange={() =>
-                      handleCheckboxChange(seeker.id, "sendForEvaluation")
-                    }
-                  />
-                </div>
-              </td>
-
-              <td className="py-3 px-6 text-sm text-gray-700 whitespace-nowrap">
-                <div className="flex items-center justify-center">
-                  <input
-                    type="checkbox"
-                    className="w-6 h-6"
-                    checked={seeker.sendInvitation}
-                    onChange={() =>
-                      handleCheckboxChange(seeker.id, "sendInvitation")
-                    }
-                  />
-                </div>
-              </td>
-
-              <td className="py-3 px-6 text-sm text-gray-700 whitespace-nowrap">
                 <div className="flex items-center justify-center gap-5">
                   <AiOutlineProfile
                     className="text-2xl text-primary cursor-pointer"
                     onClick={() => handleViewProfileClick(seeker)}
                   />
-                  <AiFillDelete className="text-2xl text-red-500 cursor-pointer" />
                 </div>
               </td>
             </tr>
