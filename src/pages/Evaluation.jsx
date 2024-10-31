@@ -209,9 +209,9 @@ const Evaluation = () => {
                 <div className="flex items-center justify-center">
                   <StarRating
                     rating={seeker.hrEvaluation || 0} // First StarRating for hrEvaluation
-                    onRatingChange={(newRating) =>
-                      handleRatingChange(seeker.id, "hrEvaluation", newRating)
-                    }
+                    // onRatingChange={(newRating) =>
+                    // handleRatingChange(seeker.id, "hrEvaluation", newRating)
+                    // }
                   />
                 </div>
               </td>

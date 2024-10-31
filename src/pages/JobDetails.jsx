@@ -36,6 +36,7 @@ const JobDetails = () => {
           return {
             appliedId: applied.id,
             hrEvaluation: applied.hr_evaluation,
+            departmentEvaluation: applied.department_evaluations,
             sendForEvaluation: applied.send_for_evaluation,
             sendInvitation: applied.send_invitation,
             ...applied.seeker,
@@ -55,10 +56,15 @@ const JobDetails = () => {
     fetchData();
   }, [id]);
 
-  const handleRatingChange = (seekerId, newRating) => {
+  const handleRatingChange = (seekerId, newRating, type) => {
     setSeekers((prevSeekers) =>
       prevSeekers.map((seeker) =>
-        seeker.id === seekerId ? { ...seeker, hrEvaluation: newRating } : seeker
+        seeker.id === seekerId
+          ? {
+              ...seeker,
+              [type]: newRating,
+            }
+          : seeker
       )
     );
   };
@@ -143,6 +149,9 @@ const JobDetails = () => {
               Hr Evaluation
             </th>
             <th className="py-3 px-6 bg-gray-100 text-center text-sm font-semibold text-gray-700 uppercase">
+              Department Evaluation
+            </th>
+            <th className="py-3 px-6 bg-gray-100 text-center text-sm font-semibold text-gray-700 uppercase">
               Send For Evaluation
             </th>
             <th className="py-3 px-6 bg-gray-100 text-center text-sm font-semibold text-gray-700 uppercase">
@@ -184,8 +193,22 @@ const JobDetails = () => {
                   <StarRating
                     rating={seeker.hrEvaluation || 0}
                     onRatingChange={(newRating) =>
-                      handleRatingChange(seeker.id, newRating)
+                      handleRatingChange(seeker.id, newRating, "hrEvaluation")
                     }
+                  />
+                </div>
+              </td>
+              <td className="py-3 px-6 text-sm text-gray-700 whitespace-nowrap">
+                <div className="flex items-center justify-center">
+                  <StarRating
+                    rating={seeker.departmentEvaluation || 0}
+                    // onRatingChange={(newRating) =>
+                    //   handleRatingChange(
+                    //     seeker.id,
+                    //     newRating,
+                    //     "departmentEvaluation"
+                    //   )
+                    // }
                   />
                 </div>
               </td>
